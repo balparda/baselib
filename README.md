@@ -26,7 +26,7 @@ along with this program. If not, see http://www.gnu.org/licenses/gpl-3.0.txt.
 Just the basics.
 
 ```
-$ hg clone https://balparda@bitbucket.org/balparda/baselib
+$ git clone https://github.com/balparda/baselib.git
 $ sudo apt-get install python3-pip pylint3
 ```
 
