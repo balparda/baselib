@@ -201,8 +201,8 @@ def BinSerialize(obj: Any, file_path: Optional[str] = None) -> bytes:
   s_obj = pickle.dumps(obj, protocol=-1)
   c_obj = bz2.compress(s_obj, 9)
   logging.info(
-      'serialization of obj; %0.1f kb serial; %0.1f kb compressed',
-      len(s_obj) / 1024.0, len(c_obj) / 1024.0)
+      'serialization of obj; %s serial; %s compressed',
+      HumanizedLength(len(s_obj)), HumanizedLength(len(c_obj)))
   # optionally save to disk
   if file_path is not None:
     try:
@@ -251,6 +251,7 @@ def BinDeSerialize(data: Optional[bytes] = None, file_path: Optional[str] = None
   # create the object
   obj = pickle.loads(s_obj)  # nosec - this is dangerous!
   logging.info(
-      'serialization of obj; %0.1f kb serial; %0.1f kb compressed',
-      len(s_obj) / 1024.0, (len_disk_data if data is None else len(data)) / 1024.0)
+      'serialization of obj; %s serial; %s compressed',
+      HumanizedLength(len(s_obj)),
+      HumanizedLength(len_disk_data if data is None else len(data)))
   return obj
