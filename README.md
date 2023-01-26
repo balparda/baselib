@@ -2,12 +2,11 @@
 
 Balparda's base library of util methods and classes.
 
-Started in 2023/January, by Daniel Balparda de Carvalho.
+Started in January/2023, by Daniel Balparda.
 
-# License
+## License
 
-Copyright (C) 2023 Daniel Balparda de Carvalho (balparda@gmail.com).
-This file is part of Irish Rail Timetable.
+Copyright (C) 2023 Daniel Balparda (balparda@gmail.com).
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +20,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see http://www.gnu.org/licenses/gpl-3.0.txt.
 
-# Setup
+## Setup
 
 Just the basics.
 
@@ -30,7 +29,7 @@ $ git clone https://github.com/balparda/baselib.git
 $ sudo apt-get install python3-pip pylint3
 ```
 
-# Usage
+## Usage
 
 Import into your project and use the utilities. Just by importing
 you will set logging at `info` level to `stderr`. Some usage examples:
