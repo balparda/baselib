@@ -1,5 +1,4 @@
 #!/usr/bin/python3 -O
-# pylint: disable=bad-indentation, invalid-name, bad-continuation
 #
 # Copyright 2023 Daniel Balparda (balparda@gmail.com)
 #
@@ -22,11 +21,12 @@ import functools
 import logging
 import os
 import os.path
-import pickle
+import pickle  # nosec - this is a dangerous module!
 # import pdb
 import time
 import sys
 from typing import Any, Callable, Optional
+import typing_extensions
 
 
 __author__ = 'balparda@gmail.com (Daniel Balparda)'
@@ -54,10 +54,6 @@ class Error(Exception):
   """Base exception."""
 
 
-class AttributeError(Error, AttributeError):
-  """Base attribute exception."""
-
-
 def StartStdErrLogging(level: int = logging.INFO, logprocess: bool = False) -> None:
   """Start logging to stderr.
 
@@ -79,7 +75,25 @@ def StartStdErrLogging(level: int = logging.INFO, logprocess: bool = False) -> N
   logger.addHandler(handler)
 
 
-class Timer():  # pylint: disable=unused-variable
+def HumanizedLength(inp_sz: int) -> str:
+  """Return human-readable size for arrays.
+
+  Args:
+    inp: A bytes blob
+
+  Returns:
+    human-readable length of inp
+  """
+  if inp_sz < 1024:
+    return '%db' % inp_sz
+  if inp_sz < 1024 * 1024:
+    return '%0.2fkb' % (inp_sz / 1024.0)
+  if inp_sz < 1024 * 1024 * 1024:
+    return '%0.2fMb' % (inp_sz / (1024.0 * 1024.0))
+  return '%0.2fGb' % (inp_sz / (1024.0 * 1024.0 * 1024.0))
+
+
+class Timer():
   """A chronometer context.
 
   Use with auto-logging, like:
@@ -99,20 +113,22 @@ class Timer():  # pylint: disable=unused-variable
   """
 
   def __init__(self, log: Optional[str] = None) -> None:
-    """Constructor.
+    """Construct.
 
     Args:
       log: (default None) If given as string will logging.info a log upon __exit__
           like "%s: %s" % (log, execution_time)
     """
-    self._start, self._end, self._log = None, None, log
+    self._start: Optional[float] = None
+    self._end: Optional[float] = None
+    self._log = log
 
   def __enter__(self) -> Any:
     """Enter Timed context. Starts the timer."""
     self._start = time.time()
     return self
 
-  def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
+  def __exit__(self, exc_type, exc_val, exc_tb) -> typing_extensions.Literal[False]:
     """Exit Timed context. Will stop the timer and will log if necessary."""
     _ = self.partial
     return False  # do not stop exceptions from propagating!
@@ -137,8 +153,7 @@ class Timer():  # pylint: disable=unused-variable
     d = self.delta
     if d > 7200.0:
       return '%0.3f hours' % (d / 3600.0)
-    else:
-      return '%0.3f min' % (d / 60.0) if d > 120.0 else '%0.3f sec' % d
+    return '%0.3f min' % (d / 60.0) if d > 120.0 else '%0.3f sec' % d
 
   @property
   def partial(self) -> str:
@@ -150,18 +165,9 @@ class Timer():  # pylint: disable=unused-variable
     return readable
 
 
-
-def _pseudo_decor(fun, argument):
-    def ret_fun(*args, **kwargs):
-        #do stuff here, for eg.
-        print ("decorator arg is %s" % str(argument))
-        return fun(*args, **kwargs)
-    return ret_fun
-
-
 def Timed(log: Optional[str] = None) -> Callable:
-  """Make any call print its execution time if used as a decorator.
-  
+  """Make any call print its execution time, to be used as a decorator.
+
   Args:
     log: (default None) If given: The message to be displayed with the time;
         if not given will use the decorated method name for a simple message
@@ -181,7 +187,7 @@ def Timed(log: Optional[str] = None) -> Callable:
 
 
 def BinSerialize(obj: Any, file_path: Optional[str] = None) -> bytes:
-  """Serializes a Python object into a BLOB.
+  """Serialize a Python object into a BLOB.
 
   Args:
     obj: Any serializable Python object
@@ -243,7 +249,7 @@ def BinDeSerialize(data: Optional[bytes] = None, file_path: Optional[str] = None
       logging.warning('No bin file found: %s', file_path)
       return None
   # create the object
-  obj = pickle.loads(s_obj)
+  obj = pickle.loads(s_obj)  # nosec - this is dangerous!
   logging.info(
       'serialization of obj; %0.1f kb serial; %0.1f kb compressed',
       len(s_obj) / 1024.0, (len_disk_data if data is None else len(data)) / 1024.0)
