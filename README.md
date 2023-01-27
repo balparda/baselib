@@ -47,7 +47,7 @@ def main():
   print(base.HumanizedLength(358573489))    # will print '341.96Mb'
   print(base.HumanizedLength(35857345689))  # will print '33.39Gb'
 
-  BinSerialize({'a': 1, 'b': 2}, '~/myfile.db')   # will save the dict to file, compressed
-  data = BinDeSerialize(file_path='~/myfile.db')  # will load the dict from file
+  BinSerialize({'a': 1, 'b': 2}, '~/my_file.db')   # will save the dict to file, compressed
+  data = BinDeSerialize(file_path='~/my_file.db')  # will load the dict from file
   # ATTENTION: serialization is dangerous, and should be used with care!
 ```

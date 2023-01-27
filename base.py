@@ -53,22 +53,22 @@ class Error(Exception):
   """Base exception."""
 
 
-def StartStdErrLogging(level: int = logging.INFO, logprocess: bool = False) -> None:
+def StartStdErrLogging(level: int = logging.INFO, log_process: bool = False) -> None:
   """Start logging to stderr.
 
   Should be called only once like  `if __name__ == '__main__': lib.StartStdErrLogging(); main()`.
 
   Args:
     level: (default logging.INFO) logging level to use
-    logprocess: (default False) If True will add process names to log strings (as in the process
-        `multiprocessing.Process(name=[somename])` call)
+    log_process: (default False) If True will add process names to log strings (as in the process
+        `multiprocessing.Process(name=[some_name])` call)
   """
   logger = logging.getLogger()
   logger.setLevel(level)
   handler = logging.StreamHandler(sys.stdout)
   handler.setLevel(level)
   formatter = logging.Formatter(
-      fmt=_LOG_FORMATS[1] if logprocess else _LOG_FORMATS[0],
+      fmt=_LOG_FORMATS[1] if log_process else _LOG_FORMATS[0],
       datefmt=_LOG_FORMATS[2])
   handler.setFormatter(formatter)
   logger.addHandler(handler)
@@ -229,7 +229,7 @@ def BinDeSerialize(data: Optional[bytes] = None, file_path: Optional[str] = None
     De-Serialized Python object corresponding to data; None if `file_name` is
     given and does not exist in config dir
   """
-  # uncompress from data or from disk
+  # decompress from data or from disk
   len_disk_data = 0
   if file_path is None:
     if data is None:
