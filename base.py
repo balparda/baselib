@@ -25,8 +25,7 @@ import pickle  # nosec - this is a dangerous module!
 # import pdb
 import time
 import sys
-from typing import Any, Callable, Optional
-import typing_extensions
+from typing import Any, Callable, Literal, Optional
 
 
 __author__ = 'balparda@gmail.com (Daniel Balparda)'
@@ -128,7 +127,7 @@ class Timer():
     self._start = time.time()
     return self
 
-  def __exit__(self, exc_type, exc_val, exc_tb) -> typing_extensions.Literal[False]:
+  def __exit__(self, exc_type, exc_val, exc_tb) -> Literal[False]:
     """Exit Timed context. Will stop the timer and will log if necessary."""
     _ = self.partial
     return False  # do not stop exceptions from propagating!
