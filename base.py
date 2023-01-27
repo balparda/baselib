@@ -118,7 +118,7 @@ class Timer():
 
     Args:
       log: (default None) If given as string will logging.info a log upon __exit__
-          like "%s: %s" % (log, execution_time)
+          like '%s: %s' % (log, execution_time)
     """
     self._start: Optional[float] = None
     self._end: Optional[float] = None
