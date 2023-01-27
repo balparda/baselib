@@ -83,6 +83,8 @@ def HumanizedLength(inp_sz: int) -> str:
   Returns:
     human-readable length of inp
   """
+  if inp_sz < 0:
+    raise AttributeError('Input should be >=0 and got %d' % inp_sz)
   if inp_sz < 1024:
     return '%db' % inp_sz
   if inp_sz < 1024 * 1024:
