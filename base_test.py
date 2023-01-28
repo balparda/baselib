@@ -1,43 +1,52 @@
 #!/usr/bin/python3 -bb
-# pylint: disable=bad-indentation, invalid-name, bad-continuation
-# pylint: disable=missing-docstring, protected-access
 #
-# Copyright 2018 Daniel Balparda (balparda@gmail.com)
+# Copyright 2023 Daniel Balparda (balparda@gmail.com)
 #
 """base.py unittest."""
 
+import os.path
 # import pdb
 import tempfile
 import time
 import unittest
-from unittest import mock
+# from unittest import mock
 
-from baselib import base
+import base
 
 __author__ = 'balparda@gmail.com (Daniel Balparda)'
 __version__ = (1, 0)
 
 
-class TestBase(unittest.TestCase):  # pylint: disable=unused-variable
+class TestBase(unittest.TestCase):
+  """Tests for base.py."""
+
+  def test_HumanizedLength(self):
+    """Test."""
+    self.assertEqual(base.HumanizedLength(0), '0b')
+    self.assertEqual(base.HumanizedLength(10), '10b')
+    self.assertEqual(base.HumanizedLength(10000), '9.77kb')
+    self.assertEqual(base.HumanizedLength(10000000), '9.54Mb')
+    self.assertEqual(base.HumanizedLength(10000000000), '9.31Gb')
+    self.assertEqual(base.HumanizedLength(10000000000000), '9.09Tb')
+    self.assertEqual(base.HumanizedLength(10000000000000000), '9094.95Tb')
+    with self.assertRaises(AttributeError):
+      base.HumanizedLength(-1)
 
   def test_Serialize(self):
+    """Test."""
     # do memory serialization test
-    serial = base.BinSerialize(({1:2, 3:4}, []))
+    serial = base.BinSerialize(({1: 2, 3: 4}, []))
     obj = base.BinDeSerialize(serial)
-    self.assertTupleEqual(obj, ({1:2, 3:4}, []))
-    # do disk serialization test; monkey-path CONFIG_DIR temporarily for this
-    # with tempfile.TemporaryDirectory() as tmpdir:
-    #   tmp_file = 'base.TestBase.test_Serialize.%d' % int(time.time())
-    #   original_config = base.CONFIG_DIR
-    #   base.CONFIG_DIR = tmpdir
-    #   try:
-    #     base.BinSerialize(({4:3, 2:1}, [None, 7]), file_name=tmp_file)
-    #     self.assertTupleEqual(
-    #         base.BinDeSerialize(file_name=tmp_file), ({4:3, 2:1}, [None, 7]))
-    #   finally:
-    #     base.CONFIG_DIR = original_config
+    self.assertTupleEqual(obj, ({1: 2, 3: 4}, []))
+    # do disk serialization test
+    with tempfile.TemporaryDirectory() as tmpdir:
+      tmp_file = os.path.join(tmpdir, 'base_test.test_Serialize.%d' % int(time.time()))
+      base.BinSerialize(({4: 3, 2: 1}, [None, 7]), file_path=tmp_file)
+      self.assertTupleEqual(
+          base.BinDeSerialize(file_path=tmp_file), ({4: 3, 2: 1}, [None, 7]))
 
   def test_Timed(self):
+    """Test."""
     with base.Timer() as tm:
       with self.assertRaises(base.Error):
         _ = tm.delta
@@ -47,6 +56,15 @@ class TestBase(unittest.TestCase):  # pylint: disable=unused-variable
     self.assertEqual(tm.readable, '16.667 min')
     tm._end = tm._start + 10000
     self.assertEqual(tm.readable, '2.778 hours')
+
+    @base.Timed('empty method')
+    def _tm():
+      pass
+
+    _tm()
+
+
+SUITE = unittest.TestLoader().loadTestsFromTestCase(TestBase)
 
 
 if __name__ == '__main__':

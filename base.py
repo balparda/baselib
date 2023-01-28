@@ -91,7 +91,9 @@ def HumanizedLength(inp_sz: int) -> str:
     return '%0.2fkb' % (inp_sz / 1024.0)
   if inp_sz < 1024 * 1024 * 1024:
     return '%0.2fMb' % (inp_sz / (1024.0 * 1024.0))
-  return '%0.2fGb' % (inp_sz / (1024.0 * 1024.0 * 1024.0))
+  if inp_sz < 1024 * 1024 * 1024 * 1024:
+    return '%0.2fGb' % (inp_sz / (1024.0 * 1024.0 * 1024.0))
+  return '%0.2fTb' % (inp_sz / (1024.0 * 1024.0 * 1024.0 * 1024.0))
 
 
 class Timer():
