@@ -48,6 +48,11 @@ _LOG_FORMATS = (
 USER_DIRECTORY = os.path.expanduser('~/')
 PRIVATE_DIR = lambda p: '~/' + p[len(USER_DIRECTORY):] if p.startswith(USER_DIRECTORY) else p
 
+# time utils
+INT_TIME = lambda: int(time.time())
+_TIME_FORMAT = '%Y/%b/%d-%H:%M:%S'
+STD_TIME_STRING = lambda t: time.strftime(_TIME_FORMAT, time.gmtime(t))  # cspell:disable-line
+
 
 class Error(Exception):
   """Base exception."""
