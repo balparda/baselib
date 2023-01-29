@@ -79,14 +79,14 @@ def StartStdErrLogging(level: int = logging.INFO, log_process: bool = False) -> 
   logger.addHandler(handler)
 
 
-def HumanizedLength(inp_sz: int) -> str:
-  """Return human-readable size for arrays.
+def HumanizedBytes(inp_sz: int) -> str:
+  """Return human-readable byte sizes.
 
   Args:
     inp: A bytes blob
 
   Returns:
-    human-readable length of inp
+    human-readable length of inp_sz
   """
   if inp_sz < 0:
     raise AttributeError('Input should be >=0 and got %d' % inp_sz)
@@ -99,6 +99,26 @@ def HumanizedLength(inp_sz: int) -> str:
   if inp_sz < 1024 * 1024 * 1024 * 1024:
     return '%0.2fGb' % (inp_sz / (1024.0 * 1024.0 * 1024.0))
   return '%0.2fTb' % (inp_sz / (1024.0 * 1024.0 * 1024.0 * 1024.0))
+
+
+def HumanizedSeconds(inp_secs: int) -> str:
+  """Return human-readable time.
+
+  Args:
+    inp: An amount of time, in seconds
+
+  Returns:
+    human-readable time from the give number of seconds (inp_secs)
+  """
+  if inp_secs < 0:
+    raise AttributeError('Input should be >=0 and got %d' % inp_secs)
+  if inp_secs < 60:
+    return '%d secs' % inp_secs
+  if inp_secs < 60 * 60:
+    return '%0.1f mins' % (inp_secs / 60.0)
+  if inp_secs < 24 * 60 * 60:
+    return '%0.1f hours' % (inp_secs / (60.0 * 60.0))
+  return '%0.1f days' % (inp_secs / (24.0 * 60.0 * 60.0))
 
 
 class Timer():
@@ -210,7 +230,7 @@ def BinSerialize(obj: Any, file_path: Optional[str] = None) -> bytes:
   c_obj = bz2.compress(s_obj, 9)
   logging.info(
       'serialization of obj; %s serial; %s compressed',
-      HumanizedLength(len(s_obj)), HumanizedLength(len(c_obj)))
+      HumanizedBytes(len(s_obj)), HumanizedBytes(len(c_obj)))
   # optionally save to disk
   if file_path is not None:
     try:
@@ -260,6 +280,6 @@ def BinDeSerialize(data: Optional[bytes] = None, file_path: Optional[str] = None
   obj = pickle.loads(s_obj)  # nosec - this is dangerous!
   logging.info(
       'serialization of obj; %s serial; %s compressed',
-      HumanizedLength(len(s_obj)),
-      HumanizedLength(len_disk_data if data is None else len(data)))
+      HumanizedBytes(len(s_obj)),
+      HumanizedBytes(len_disk_data if data is None else len(data)))
   return obj

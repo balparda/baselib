@@ -20,17 +20,27 @@ __version__ = (1, 0)
 class TestBase(unittest.TestCase):
   """Tests for base.py."""
 
-  def test_HumanizedLength(self):
+  def test_HumanizedBytes(self):
     """Test."""
-    self.assertEqual(base.HumanizedLength(0), '0b')
-    self.assertEqual(base.HumanizedLength(10), '10b')
-    self.assertEqual(base.HumanizedLength(10000), '9.77kb')
-    self.assertEqual(base.HumanizedLength(10000000), '9.54Mb')
-    self.assertEqual(base.HumanizedLength(10000000000), '9.31Gb')
-    self.assertEqual(base.HumanizedLength(10000000000000), '9.09Tb')
-    self.assertEqual(base.HumanizedLength(10000000000000000), '9094.95Tb')
+    self.assertEqual(base.HumanizedBytes(0), '0b')
+    self.assertEqual(base.HumanizedBytes(10), '10b')
+    self.assertEqual(base.HumanizedBytes(10000), '9.77kb')
+    self.assertEqual(base.HumanizedBytes(10000000), '9.54Mb')
+    self.assertEqual(base.HumanizedBytes(10000000000), '9.31Gb')
+    self.assertEqual(base.HumanizedBytes(10000000000000), '9.09Tb')
+    self.assertEqual(base.HumanizedBytes(10000000000000000), '9094.95Tb')
     with self.assertRaises(AttributeError):
-      base.HumanizedLength(-1)
+      base.HumanizedBytes(-1)
+
+  def test_HumanizedSeconds(self):
+    """Test."""
+    self.assertEqual(base.HumanizedSeconds(0), '0 secs')
+    self.assertEqual(base.HumanizedSeconds(10), '10 secs')
+    self.assertEqual(base.HumanizedSeconds(135), '2.2 mins')
+    self.assertEqual(base.HumanizedSeconds(5000), '1.4 hours')
+    self.assertEqual(base.HumanizedSeconds(100000), '1.2 days')
+    with self.assertRaises(AttributeError):
+      base.HumanizedSeconds(-1)
 
   def test_Serialize(self):
     """Test."""
