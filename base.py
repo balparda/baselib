@@ -83,10 +83,10 @@ def HumanizedBytes(inp_sz: int) -> str:
   """Return human-readable byte sizes.
 
   Args:
-    inp: A bytes blob
+    inp: A bytes length
 
   Returns:
-    human-readable length of inp_sz
+    human-readable length for inp_sz
   """
   if inp_sz < 0:
     raise AttributeError('Input should be >=0 and got %d' % inp_sz)
@@ -99,6 +99,28 @@ def HumanizedBytes(inp_sz: int) -> str:
   if inp_sz < 1024 * 1024 * 1024 * 1024:
     return '%0.2fGb' % (inp_sz / (1024.0 * 1024.0 * 1024.0))
   return '%0.2fTb' % (inp_sz / (1024.0 * 1024.0 * 1024.0 * 1024.0))
+
+
+def HumanizedDecimal(inp_sz: int) -> str:
+  """Return human-readable decimal-measured sizes.
+
+  Args:
+    inp: A length from a measure to be converted by multiples of 1000, like Megapixel.
+
+  Returns:
+    human-readable length of decimal inp_sz
+  """
+  if inp_sz < 0:
+    raise AttributeError('Input should be >=0 and got %d' % inp_sz)
+  if inp_sz < 1000:
+    return '%d' % inp_sz
+  if inp_sz < 1000 * 1000:
+    return '%0.2fk' % (inp_sz / 1000.0)
+  if inp_sz < 1000 * 1000 * 1000:
+    return '%0.2fM' % (inp_sz / (1000.0 * 1000.0))
+  if inp_sz < 1000 * 1000 * 1000 * 1000:
+    return '%0.2fG' % (inp_sz / (1000.0 * 1000.0 * 1000.0))
+  return '%0.2fT' % (inp_sz / (1000.0 * 1000.0 * 1000.0 * 1000.0))
 
 
 def HumanizedSeconds(inp_secs: int) -> str:

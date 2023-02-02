@@ -32,6 +32,18 @@ class TestBase(unittest.TestCase):
     with self.assertRaises(AttributeError):
       base.HumanizedBytes(-1)
 
+  def test_HumanizedDecimal(self):
+    """Test."""
+    self.assertEqual(base.HumanizedDecimal(0), '0')
+    self.assertEqual(base.HumanizedDecimal(11), '11')
+    self.assertEqual(base.HumanizedDecimal(12100), '12.10k')
+    self.assertEqual(base.HumanizedDecimal(13200000), '13.20M')
+    self.assertEqual(base.HumanizedDecimal(14300000000), '14.30G')
+    self.assertEqual(base.HumanizedDecimal(15400000000000), '15.40T')
+    self.assertEqual(base.HumanizedDecimal(16500000000000000), '16500.00T')
+    with self.assertRaises(AttributeError):
+      base.HumanizedDecimal(-1)
+
   def test_HumanizedSeconds(self):
     """Test."""
     self.assertEqual(base.HumanizedSeconds(0), '0 secs')
