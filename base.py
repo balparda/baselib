@@ -143,7 +143,7 @@ def HumanizedSeconds(inp_secs: int) -> str:
   return '%0.1f days' % (inp_secs / (24.0 * 60.0 * 60.0))
 
 
-class Timer():
+class Timer:
   """A chronometer context.
 
   Use with auto-logging, like:
