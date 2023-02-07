@@ -20,6 +20,10 @@ __version__ = (1, 0)
 class TestBase(unittest.TestCase):
   """Tests for base.py."""
 
+  def test_TimeString(self):
+    """Test."""
+    self.assertEqual(base.STD_TIME_STRING(1675788907), '2023/Feb/07-16:55:07-UTC')
+
   def test_HumanizedBytes(self):
     """Test."""
     self.assertEqual(base.HumanizedBytes(0), '0b')
