@@ -52,7 +52,7 @@ PRIVATE_DIR = lambda p: '~/' + p[len(USER_DIRECTORY):] if p.startswith(USER_DIRE
 INT_TIME = lambda: int(time.time())
 _TIME_FORMAT = '%Y/%b/%d-%H:%M:%S-UTC'
 # cspell:disable-next-line
-STD_TIME_STRING = lambda t: time.strftime(_TIME_FORMAT, time.gmtime(t))  # type: ignore
+STD_TIME_STRING = lambda t: (time.strftime(_TIME_FORMAT, time.gmtime(t)) if t else '-')
 
 
 class Error(Exception):
