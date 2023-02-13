@@ -163,7 +163,7 @@ class Timer:
   See also the Timed() decorator below.
   """
 
-  def __init__(self, log: Optional[str] = None) -> None:
+  def __init__(self, log: Optional[str] = None):
     """Construct.
 
     Args:
@@ -280,7 +280,7 @@ def BinDeSerialize(data: Optional[bytes] = None, file_path: Optional[str] = None
     given and does not exist in config dir
   """
   # decompress from data or from disk
-  len_disk_data = 0
+  len_disk_data: int = 0
   if file_path is None:
     if data is None:
       return None
