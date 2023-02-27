@@ -25,7 +25,7 @@ import pickle  # nosec - this is a dangerous module!
 # import pdb
 import time
 import sys
-from typing import Any, Callable, Literal, Optional
+from typing import Any, Callable, Literal, Optional, Union
 
 
 __author__ = 'balparda@gmail.com (Daniel Balparda)'
@@ -124,24 +124,31 @@ def HumanizedDecimal(inp_sz: int) -> str:
   return '%0.2fT' % (inp_sz / (1000.0 * 1000.0 * 1000.0 * 1000.0))
 
 
-def HumanizedSeconds(inp_secs: int) -> str:
+def HumanizedSeconds(inp_secs: Union[int, float]) -> str:
   """Return human-readable time.
 
   Args:
-    inp: An amount of time, in seconds
+    inp: An amount of time, in seconds, int or float
 
   Returns:
     human-readable time from the give number of seconds (inp_secs)
   """
-  if inp_secs < 0:
+  if inp_secs == 0:
+    return '0 secs'
+  inp_secs = float(inp_secs)
+  if inp_secs < 0.0:
     raise AttributeError('Input should be >=0 and got %d' % inp_secs)
-  if inp_secs < 60:
-    return '%d secs' % inp_secs
-  if inp_secs < 60 * 60:
-    return '%0.1f mins' % (inp_secs / 60.0)
-  if inp_secs < 24 * 60 * 60:
-    return '%0.1f hours' % (inp_secs / (60.0 * 60.0))
-  return '%0.1f days' % (inp_secs / (24.0 * 60.0 * 60.0))
+  if inp_secs < 0.01:
+    return '%0.6f secs' % inp_secs
+  if inp_secs < 1.0:
+    return '%0.4f secs' % inp_secs
+  if inp_secs < 60.0:
+    return '%0.2f secs' % inp_secs
+  if inp_secs < 60.0 * 60.0:
+    return '%0.2f mins' % (inp_secs / 60.0)
+  if inp_secs < 24.0 * 60.0 * 60.0:
+    return '%0.2f hours' % (inp_secs / (60.0 * 60.0))
+  return '%0.2f days' % (inp_secs / (24.0 * 60.0 * 60.0))
 
 
 class Timer:
@@ -201,10 +208,7 @@ class Timer:
   @property
   def readable(self) -> str:
     """A readable string for the delta, in 'sec', 'min' or 'hours'."""
-    d = self.delta
-    if d > 7200.0:
-      return '%0.3f hours' % (d / 3600.0)
-    return '%0.3f min' % (d / 60.0) if d > 120.0 else '%0.3f sec' % d
+    return HumanizedSeconds(self.delta)
 
   @property
   def partial(self) -> str:
@@ -237,35 +241,42 @@ def Timed(log: Optional[str] = None) -> Callable:
   return _Timed
 
 
-def BinSerialize(obj: Any, file_path: Optional[str] = None) -> bytes:
+def BinSerialize(obj: Any, file_path: Optional[str] = None, compress: bool = True) -> bytes:
   """Serialize a Python object into a BLOB.
 
   Args:
     obj: Any serializable Python object
     file_path: (default None) File full path to optionally save the data to;
         IO failures will be logged and ignored
+    compress: (default True) Compress before saving?
 
   Returns:
     Serialized binary data (bytes) corresponding to obj
   """
   # serialize
-  s_obj = pickle.dumps(obj, protocol=-1)
-  c_obj = bz2.compress(s_obj, 9)
+  with Timer() as tm_pickle:
+    s_obj = pickle.dumps(obj, protocol=-1)
+  with Timer() as tm_compress:
+    c_obj = bz2.compress(s_obj, 9) if compress else s_obj
   logging.info(
-      'serialization of obj; %s serial; %s compressed',
-      HumanizedBytes(len(s_obj)), HumanizedBytes(len(c_obj)))
+      'SERIALIZATION: %s serial (%s pickle)%s',
+      HumanizedBytes(len(s_obj)), tm_pickle.readable,
+      '; %s compressed (%s)' % (HumanizedBytes(len(c_obj)), tm_compress.readable)
+      if compress else '')
   # optionally save to disk
   if file_path is not None:
     try:
-      with open(file_path, 'wb') as f:
-        f.write(c_obj)
-        logging.info('Bin file saved: %s', file_path)
+      with Timer() as tm_save:
+        with open(file_path, 'wb') as f:
+          f.write(c_obj)
+      logging.info('Bin file saved: %r (%s)', file_path, tm_save.readable)
     except IOError as err:
       logging.warning('Could not save bin file %r, error: %s', file_path, err)
   return c_obj
 
 
-def BinDeSerialize(data: Optional[bytes] = None, file_path: Optional[str] = None) -> Any:
+def BinDeSerialize(
+    data: Optional[bytes] = None, file_path: Optional[str] = None, compress: bool = True) -> Any:
   """De-Serializes a BLOB back to a Python object.
 
   Args:
@@ -274,6 +285,7 @@ def BinDeSerialize(data: Optional[bytes] = None, file_path: Optional[str] = None
         If you use this option, then `data` WILL BE IGNORED and errors will be fatal,
         except non-existence of the file, which is checked for, and will make the method
         return None
+    compress: (default True) Compress before saving?
 
   Returns:
     De-Serialized Python object corresponding to data; None if `file_name` is
@@ -284,15 +296,18 @@ def BinDeSerialize(data: Optional[bytes] = None, file_path: Optional[str] = None
   if file_path is None:
     if data is None:
       return None
-    s_obj = bz2.decompress(data)
+    with Timer() as tm_decompress:
+      s_obj = bz2.decompress(data) if compress else data
   else:
     if os.path.exists(file_path):
-      logging.info('Reading bin file: %s', file_path)
       try:
-        with open(file_path, 'rb') as f:
-          disk_data = f.read()
-          len_disk_data = len(disk_data)
-          s_obj = bz2.decompress(disk_data)
+        with Timer() as tm_load:
+          with open(file_path, 'rb') as f:
+            disk_data = f.read()
+        logging.info('Read bin file: %r (%s)', file_path, tm_load.readable)
+        len_disk_data = len(disk_data)
+        with Timer() as tm_decompress:
+          s_obj = bz2.decompress(disk_data) if compress else disk_data
       except IOError as err:
         logging.warning('Could not load bin file %r, error: %s', file_path, err)
         return None
@@ -300,9 +315,12 @@ def BinDeSerialize(data: Optional[bytes] = None, file_path: Optional[str] = None
       logging.warning('No bin file found: %s', file_path)
       return None
   # create the object
-  obj = pickle.loads(s_obj)  # nosec - this is dangerous!
+  with Timer() as tm_pickle:
+    obj = pickle.loads(s_obj)  # nosec - this is dangerous!
   logging.info(
-      'serialization of obj; %s serial; %s compressed',
-      HumanizedBytes(len(s_obj)),
-      HumanizedBytes(len_disk_data if data is None else len(data)))
+      'DE-SERIALIZATION: %s serial (%s pickle)%s',
+      HumanizedBytes(len(s_obj)), tm_pickle.readable,
+      '; %s compressed (%s)' % (HumanizedBytes(len_disk_data if data is None else len(data)),
+                                tm_decompress.readable)
+      if compress else '')
   return obj

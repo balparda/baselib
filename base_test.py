@@ -51,10 +51,13 @@ class TestBase(unittest.TestCase):
   def test_HumanizedSeconds(self):
     """Test."""
     self.assertEqual(base.HumanizedSeconds(0), '0 secs')
-    self.assertEqual(base.HumanizedSeconds(10), '10 secs')
-    self.assertEqual(base.HumanizedSeconds(135), '2.2 mins')
-    self.assertEqual(base.HumanizedSeconds(5000), '1.4 hours')
-    self.assertEqual(base.HumanizedSeconds(100000), '1.2 days')
+    self.assertEqual(base.HumanizedSeconds(0.0), '0 secs')
+    self.assertEqual(base.HumanizedSeconds(0.00456789), '0.004568 secs')
+    self.assertEqual(base.HumanizedSeconds(0.456789), '0.4568 secs')
+    self.assertEqual(base.HumanizedSeconds(10), '10.00 secs')
+    self.assertEqual(base.HumanizedSeconds(135), '2.25 mins')
+    self.assertEqual(base.HumanizedSeconds(5000), '1.39 hours')
+    self.assertEqual(base.HumanizedSeconds(100000), '1.16 days')
     with self.assertRaises(AttributeError):
       base.HumanizedSeconds(-1)
 
@@ -63,6 +66,10 @@ class TestBase(unittest.TestCase):
     # do memory serialization test
     serial = base.BinSerialize(({1: 2, 3: 4}, []))
     obj = base.BinDeSerialize(serial)
+    self.assertTupleEqual(obj, ({1: 2, 3: 4}, []))
+    # do uncompressed memory serialization test
+    serial = base.BinSerialize(({1: 2, 3: 4}, []), compress=False)
+    obj = base.BinDeSerialize(serial, compress=False)
     self.assertTupleEqual(obj, ({1: 2, 3: 4}, []))
     # do disk serialization test
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -77,11 +84,11 @@ class TestBase(unittest.TestCase):
       with self.assertRaises(base.Error):
         _ = tm.delta
     tm._start, tm._end = 1455237912.5451021, 1455237944.955657
-    self.assertEqual(tm.readable, '32.411 sec')
+    self.assertEqual(tm.readable, '32.41 secs')
     tm._end = tm._start + 1000
-    self.assertEqual(tm.readable, '16.667 min')
+    self.assertEqual(tm.readable, '16.67 mins')
     tm._end = tm._start + 10000
-    self.assertEqual(tm.readable, '2.778 hours')
+    self.assertEqual(tm.readable, '2.78 hours')
 
     @base.Timed('empty method')
     def _tm():
