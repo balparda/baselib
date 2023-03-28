@@ -2,6 +2,7 @@
 #
 # Copyright 2023 Daniel Balparda (balparda@gmail.com)
 #
+# pylint: disable=invalid-name,protected-access
 """base.py unittest."""
 
 import os.path
@@ -11,7 +12,7 @@ import time
 import unittest
 # from unittest import mock
 
-import base
+from baselib import base
 
 __author__ = 'balparda@gmail.com (Daniel Balparda)'
 __version__ = (1, 0)
@@ -73,7 +74,7 @@ class TestBase(unittest.TestCase):
     self.assertTupleEqual(obj, ({1: 2, 3: 4}, []))
     # do disk serialization test
     with tempfile.TemporaryDirectory() as tmpdir:
-      tmp_file = os.path.join(tmpdir, 'base_test.test_Serialize.%d' % int(time.time()))
+      tmp_file = os.path.join(tmpdir, f'base_test.test_Serialize.{int(time.time())}')
       base.BinSerialize(({4: 3, 2: 1}, [None, 7]), file_path=tmp_file)
       self.assertTupleEqual(
           base.BinDeSerialize(file_path=tmp_file), ({4: 3, 2: 1}, [None, 7]))

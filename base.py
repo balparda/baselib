@@ -90,16 +90,16 @@ def HumanizedBytes(inp_sz: int) -> str:
     human-readable length for inp_sz
   """
   if inp_sz < 0:
-    raise AttributeError('Input should be >=0 and got %d' % inp_sz)
+    raise AttributeError(f'Input should be >=0 and got {inp_sz}')
   if inp_sz < 1024:
-    return '%db' % inp_sz
+    return f'{inp_sz}b'
   if inp_sz < 1024 * 1024:
-    return '%0.2fkb' % (inp_sz / 1024.0)
+    return f'{(inp_sz / 1024.0):0.2f}kb'
   if inp_sz < 1024 * 1024 * 1024:
-    return '%0.2fMb' % (inp_sz / (1024.0 * 1024.0))
+    return f'{(inp_sz / (1024.0 * 1024.0)):0.2f}Mb'
   if inp_sz < 1024 * 1024 * 1024 * 1024:
-    return '%0.2fGb' % (inp_sz / (1024.0 * 1024.0 * 1024.0))
-  return '%0.2fTb' % (inp_sz / (1024.0 * 1024.0 * 1024.0 * 1024.0))
+    return f'{(inp_sz / (1024.0 * 1024.0 * 1024.0)):0.2f}Gb'
+  return f'{(inp_sz / (1024.0 * 1024.0 * 1024.0 * 1024.0)):0.2f}Tb'
 
 
 def HumanizedDecimal(inp_sz: int) -> str:
@@ -112,16 +112,16 @@ def HumanizedDecimal(inp_sz: int) -> str:
     human-readable length of decimal inp_sz
   """
   if inp_sz < 0:
-    raise AttributeError('Input should be >=0 and got %d' % inp_sz)
+    raise AttributeError(f'Input should be >=0 and got {inp_sz}')
   if inp_sz < 1000:
-    return '%d' % inp_sz
+    return str(inp_sz)
   if inp_sz < 1000 * 1000:
-    return '%0.2fk' % (inp_sz / 1000.0)
+    return f'{(inp_sz / 1000.0):0.2f}k'
   if inp_sz < 1000 * 1000 * 1000:
-    return '%0.2fM' % (inp_sz / (1000.0 * 1000.0))
+    return f'{(inp_sz / (1000.0 * 1000.0)):0.2f}M'
   if inp_sz < 1000 * 1000 * 1000 * 1000:
-    return '%0.2fG' % (inp_sz / (1000.0 * 1000.0 * 1000.0))
-  return '%0.2fT' % (inp_sz / (1000.0 * 1000.0 * 1000.0 * 1000.0))
+    return f'{(inp_sz / (1000.0 * 1000.0 * 1000.0)):0.2f}G'
+  return f'{(inp_sz / (1000.0 * 1000.0 * 1000.0 * 1000.0)):0.2f}T'
 
 
 def HumanizedSeconds(inp_secs: Union[int, float]) -> str:
@@ -137,18 +137,18 @@ def HumanizedSeconds(inp_secs: Union[int, float]) -> str:
     return '0 secs'
   inp_secs = float(inp_secs)
   if inp_secs < 0.0:
-    raise AttributeError('Input should be >=0 and got %d' % inp_secs)
+    raise AttributeError(f'Input should be >=0 and got {inp_secs}')
   if inp_secs < 0.01:
-    return '%0.6f secs' % inp_secs
+    return f'{inp_secs:0.6f} secs'
   if inp_secs < 1.0:
-    return '%0.4f secs' % inp_secs
+    return f'{inp_secs:0.4f} secs'
   if inp_secs < 60.0:
-    return '%0.2f secs' % inp_secs
+    return f'{inp_secs:0.2f} secs'
   if inp_secs < 60.0 * 60.0:
-    return '%0.2f mins' % (inp_secs / 60.0)
+    return f'{(inp_secs / 60.0):0.2f} mins'
   if inp_secs < 24.0 * 60.0 * 60.0:
-    return '%0.2f hours' % (inp_secs / (60.0 * 60.0))
-  return '%0.2f days' % (inp_secs / (24.0 * 60.0 * 60.0))
+    return f'{(inp_secs / (60.0 * 60.0)):0.2f} hours'
+  return f'{(inp_secs / (24.0 * 60.0 * 60.0)):0.2f} days'
 
 
 class Timer:
@@ -231,12 +231,12 @@ def Timed(log: Optional[str] = None) -> Callable:
   def _Timed(func: Callable) -> Callable:
 
     @functools.wraps(func)
-    def _wrapped_call(*args, **kwargs):
-      log_message = '%r execution time' % (func.__name__ + '()') if log is None else log
+    def _WrappedCall(*args, **kwargs):
+      log_message = f'{(func.__name__ + "()") if log is None else log!r} execution time'
       with Timer(log=log_message):
         return func(*args, **kwargs)
 
-    return _wrapped_call
+    return _WrappedCall
 
   return _Timed
 
@@ -261,14 +261,13 @@ def BinSerialize(obj: Any, file_path: Optional[str] = None, compress: bool = Tru
   logging.info(
       'SERIALIZATION: %s serial (%s pickle)%s',
       HumanizedBytes(len(s_obj)), tm_pickle.readable,
-      '; %s compressed (%s)' % (HumanizedBytes(len(c_obj)), tm_compress.readable)
-      if compress else '')
+      f'; {HumanizedBytes(len(c_obj))} compressed ({tm_compress.readable})' if compress else '')
   # optionally save to disk
   if file_path is not None:
     try:
       with Timer() as tm_save:
-        with open(file_path, 'wb') as f:
-          f.write(c_obj)
+        with open(file_path, 'wb') as file_obj:
+          file_obj.write(c_obj)
       logging.info('Bin file saved: %r (%s)', file_path, tm_save.readable)
     except IOError as err:
       logging.warning('Could not save bin file %r, error: %s', file_path, err)
@@ -302,8 +301,8 @@ def BinDeSerialize(
     if os.path.exists(file_path):
       try:
         with Timer() as tm_load:
-          with open(file_path, 'rb') as f:
-            disk_data = f.read()
+          with open(file_path, 'rb') as file_obj:
+            disk_data = file_obj.read()
         logging.info('Read bin file: %r (%s)', file_path, tm_load.readable)
         len_disk_data = len(disk_data)
         with Timer() as tm_decompress:
@@ -320,7 +319,6 @@ def BinDeSerialize(
   logging.info(
       'DE-SERIALIZATION: %s serial (%s pickle)%s',
       HumanizedBytes(len(s_obj)), tm_pickle.readable,
-      '; %s compressed (%s)' % (HumanizedBytes(len_disk_data if data is None else len(data)),
-                                tm_decompress.readable)
-      if compress else '')
+      f'; {HumanizedBytes(len_disk_data if data is None else len(data))} compressed '
+      f'({tm_decompress.readable})' if compress else '')
   return obj

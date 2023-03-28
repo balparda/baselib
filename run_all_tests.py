@@ -6,8 +6,8 @@
 
 import logging
 
-import base
-import base_test
+from baselib import base
+from baselib import base_test
 
 __author__ = 'balparda@gmail.com (Daniel Balparda)'
 __version__ = (1, 0)
@@ -19,7 +19,7 @@ _TEST_MODULES_TO_RUN = (
 
 
 @base.Timed('Total baselib package test time')
-def main():
+def Main():
   """Run all of the tests."""
   logging.info('*' * 80)
   for module in _TEST_MODULES_TO_RUN:
@@ -31,4 +31,4 @@ def main():
 
 
 if __name__ == "__main__":
-  main()
+  Main()
