@@ -16,6 +16,7 @@
 #
 """Balparda's base library of util methods and classes."""
 
+import base64
 import bz2
 import functools
 import logging
@@ -27,6 +28,10 @@ import time
 import sys
 from typing import Any, Callable, Literal, Optional, Union
 
+from cryptography.hazmat.primitives import hashes as hazmat_hashes
+from cryptography.hazmat.primitives.kdf import pbkdf2 as hazmat_pbkdf2
+
+from baselib import bin_fernet
 
 __author__ = 'balparda@gmail.com (Daniel Balparda)'
 __version__ = (1, 0)
@@ -139,7 +144,7 @@ def HumanizedSeconds(inp_secs: Union[int, float]) -> str:
   if inp_secs < 0.0:
     raise AttributeError(f'Input should be >=0 and got {inp_secs}')
   if inp_secs < 0.01:
-    return f'{inp_secs:0.6f} secs'
+    return f'{inp_secs * 1000.0:0.3f} msecs'
   if inp_secs < 1.0:
     return f'{inp_secs:0.4f} secs'
   if inp_secs < 60.0:
@@ -241,14 +246,57 @@ def Timed(log: Optional[str] = None) -> Callable:
   return _Timed
 
 
-def BinSerialize(obj: Any, file_path: Optional[str] = None, compress: bool = True) -> bytes:
+def DeriveKeyFromStaticPassword(str_password: str) -> bytes:
+  """Derive crypto key using string password.
+
+  This is, purposefully, a very costly operation that should be cheap to execute once
+  after the user typed a password, but costly for an attacker to run a dictionary campaign on.
+  We do not use salt (or, more precisely, we use a fixed salt), as this is meant for direct use,
+  not to store the key in a DB. To compensate, the number o iterations is set especially high:
+  on the computer this was developed it takes ~1 sec to execute and is almost triple the
+  recommended amount of 600,000 (see https://en.wikipedia.org/wiki/PBKDF2).
+
+  The salt and the iteration number were randomly generated when this method was written
+  so as to be unique to this implementation and not a standard one that can have a standard
+  dictionary (i.e. attacks would have to generate a dictionary specific to this implementation).
+  ON THE OTHER HAND, this only serves the purpose of generating keys from static passwords.
+  NEVER use this method to save a database of keys. ONLY use it for direct user input.
+
+  Args:
+    str_password: Non-empty string password
+
+  Returns:
+    Fernet crypto key to use (URL-safe base64-encoded 32-byte key)
+
+  Raises:
+    Error: empty password
+  """
+  if not str_password or not str_password.strip():
+    raise Error('Empty passwords not allowed, for safety reasons')
+  kdf = hazmat_pbkdf2.PBKDF2HMAC(
+      algorithm=hazmat_hashes.SHA256(),
+      length=32,
+      salt=b'\xda4,92\x80\x88\xf1\xc8\x18x@Q\x95*&',  # fixed salt: do NOT ever change!
+      iterations=1745202)                             # fixed iterations: do NOT ever change!
+  crypto_key = kdf.derive(str_password.encode('utf-8'))
+  return base64.urlsafe_b64encode(crypto_key)
+
+
+def BinSerialize(
+    obj: Any, file_path: Optional[str] = None,
+    compress: bool = True, key: Optional[bytes] = None) -> bytes:
   """Serialize a Python object into a BLOB.
+
+  If encryption is "on", note that the original Fernet deals in URL-safe base64, but we have a
+  copy here (bin_fernet.BinaryFernet) that deals in raw bytes.
 
   Args:
     obj: Any serializable Python object
     file_path: (default None) File full path to optionally save the data to;
         IO failures will be logged and ignored
     compress: (default True) Compress before saving?
+    key: (default None) If given will be interpreted as a Fernet crypto key to use
+        (URL-safe base64-encoded 32-byte key; use DeriveKeyFromStaticPassword() to get from string)
 
   Returns:
     Serialized binary data (bytes) corresponding to obj
@@ -256,69 +304,73 @@ def BinSerialize(obj: Any, file_path: Optional[str] = None, compress: bool = Tru
   # serialize
   with Timer() as tm_pickle:
     s_obj = pickle.dumps(obj, protocol=-1)
+  # compress, if needed
   with Timer() as tm_compress:
     c_obj = bz2.compress(s_obj, 9) if compress else s_obj
+  # encrypt, if needed
+  with Timer() as tm_crypto:
+    e_obj = c_obj if key is None else bin_fernet.BinaryFernet(key).encrypt(c_obj)
+  # output some logs, with measurements
   logging.info(
-      'SERIALIZATION: %s serial (%s pickle)%s',
+      'SERIALIZATION: %s serial (%s pickle)%s%s',
       HumanizedBytes(len(s_obj)), tm_pickle.readable,
-      f'; {HumanizedBytes(len(c_obj))} compressed ({tm_compress.readable})' if compress else '')
+      f'; {HumanizedBytes(len(c_obj))} compressed ({tm_compress.readable})' if compress else '',
+      '' if key is None else f'; {HumanizedBytes(len(e_obj))} encrypted ({tm_crypto.readable})')
   # optionally save to disk
   if file_path is not None:
-    try:
-      with Timer() as tm_save:
-        with open(file_path, 'wb') as file_obj:
-          file_obj.write(c_obj)
-      logging.info('Bin file saved: %r (%s)', file_path, tm_save.readable)
-    except IOError as err:
-      logging.warning('Could not save bin file %r, error: %s', file_path, err)
-  return c_obj
+    with Timer() as tm_save:
+      with open(file_path, 'wb') as file_obj:
+        file_obj.write(e_obj)
+    logging.info('Bin file saved: %r (%s)', file_path, tm_save.readable)
+  return e_obj
 
 
 def BinDeSerialize(
-    data: Optional[bytes] = None, file_path: Optional[str] = None, compress: bool = True) -> Any:
+    data: Optional[bytes] = None, file_path: Optional[str] = None,
+    compress: bool = True, key: Optional[bytes] = None) -> Any:
   """De-Serializes a BLOB back to a Python object.
+
+  If encryption is "on", note that the original Fernet deals in URL-safe base64, but we have a
+  copy here (bin_fernet.BinaryFernet) that deals in raw bytes.
 
   Args:
     data: (default None) BLOB (binary data string)
     file_path: (default None) File full path to optionally load the data from;
-        If you use this option, then `data` WILL BE IGNORED and errors will be fatal,
-        except non-existence of the file, which is checked for, and will make the method
-        return None
+        if you use this option, then `data` WILL BE IGNORED and errors will be fatal
     compress: (default True) Compress before saving?
+    key: (default None) If given will be interpreted as a Fernet crypto key to use
+        (URL-safe base64-encoded 32-byte key; use DeriveKeyFromStaticPassword() to get from string)
 
   Returns:
     De-Serialized Python object corresponding to data; None if `file_name` is
     given and does not exist in config dir
   """
-  # decompress from data or from disk
-  len_disk_data: int = 0
   if file_path is None:
+    # no disk operation needed
     if data is None:
       return None
-    with Timer() as tm_decompress:
-      s_obj = bz2.decompress(data) if compress else data
+    e_obj = data
   else:
-    if os.path.exists(file_path):
-      try:
-        with Timer() as tm_load:
-          with open(file_path, 'rb') as file_obj:
-            disk_data = file_obj.read()
-        logging.info('Read bin file: %r (%s)', file_path, tm_load.readable)
-        len_disk_data = len(disk_data)
-        with Timer() as tm_decompress:
-          s_obj = bz2.decompress(disk_data) if compress else disk_data
-      except IOError as err:
-        logging.warning('Could not load bin file %r, error: %s', file_path, err)
-        return None
-    else:
-      logging.warning('No bin file found: %s', file_path)
-      return None
-  # create the object
+    # load data from disk
+    if not os.path.exists(file_path):
+      raise Error(f'File {file_path!r} not found')
+    with Timer() as tm_load:
+      with open(file_path, 'rb') as file_obj:
+        e_obj = file_obj.read()
+    logging.info('Read bin file: %r (%s)', file_path, tm_load.readable)
+  # we have the data; decrypt, if needed
+  with Timer() as tm_crypto:
+    c_obj = e_obj if key is None else bin_fernet.BinaryFernet(key).decrypt(e_obj)
+  # decompress, if needed
+  with Timer() as tm_decompress:
+    s_obj = bz2.decompress(c_obj) if compress else c_obj
+  # create the actual object
   with Timer() as tm_pickle:
     obj = pickle.loads(s_obj)  # nosec - this is dangerous!
+  # output some logs, with measurements
   logging.info(
-      'DE-SERIALIZATION: %s serial (%s pickle)%s',
+      'DE-SERIALIZATION: %s serial (%s pickle)%s%s',
       HumanizedBytes(len(s_obj)), tm_pickle.readable,
-      f'; {HumanizedBytes(len_disk_data if data is None else len(data))} compressed '
-      f'({tm_decompress.readable})' if compress else '')
+      f'; {HumanizedBytes(len(c_obj))} compressed ({tm_decompress.readable})' if compress else '',
+      '' if key is None else f'; {HumanizedBytes(len(e_obj))} compressed ({tm_crypto.readable})')
   return obj

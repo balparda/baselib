@@ -53,7 +53,7 @@ class TestBase(unittest.TestCase):
     """Test."""
     self.assertEqual(base.HumanizedSeconds(0), '0 secs')
     self.assertEqual(base.HumanizedSeconds(0.0), '0 secs')
-    self.assertEqual(base.HumanizedSeconds(0.00456789), '0.004568 secs')
+    self.assertEqual(base.HumanizedSeconds(0.00456789), '4.568 msecs')
     self.assertEqual(base.HumanizedSeconds(0.456789), '0.4568 secs')
     self.assertEqual(base.HumanizedSeconds(10), '10.00 secs')
     self.assertEqual(base.HumanizedSeconds(135), '2.25 mins')
@@ -62,6 +62,21 @@ class TestBase(unittest.TestCase):
     with self.assertRaises(AttributeError):
       base.HumanizedSeconds(-1)
 
+  def test_DeriveKeyFromStaticPassword(self):
+    """Test."""
+    with self.assertRaisesRegex(base.Error, 'Empty passwords'):
+      base.DeriveKeyFromStaticPassword(None)  # type: ignore
+    with self.assertRaisesRegex(base.Error, 'Empty passwords'):
+      base.DeriveKeyFromStaticPassword('  \n ')
+    with base.Timer(log='DeriveKeyFromStaticPassword - luke'):
+      self.assertEqual(
+          base.DeriveKeyFromStaticPassword('luke'),
+          b'0rCiyBrqWokX9UNBiYzkvhi9ZsjoIyGeUdtkbPAjzaY=')
+    with base.Timer(log='DeriveKeyFromStaticPassword - Ben Star Wars Jedi'):
+      self.assertEqual(
+          base.DeriveKeyFromStaticPassword('Ben Star Wars Jedi'),
+          b'yAK_QpO2RrSqwzzO8relAbl5c_cBgvp_cVPtk1D-Hrw=')  # cspell:disable-line
+
   def test_Serialize(self):
     """Test."""
     # do memory serialization test
@@ -69,10 +84,19 @@ class TestBase(unittest.TestCase):
     obj = base.BinDeSerialize(serial)
     self.assertTupleEqual(obj, ({1: 2, 3: 4}, []))
     # do uncompressed memory serialization test
-    serial = base.BinSerialize(({1: 2, 3: 4}, []), compress=False)
+    serial = base.BinSerialize(({5: 6, 7: 8}, [9, 10]), compress=False)
     obj = base.BinDeSerialize(serial, compress=False)
-    self.assertTupleEqual(obj, ({1: 2, 3: 4}, []))
-    # do disk serialization test
+    self.assertTupleEqual(obj, ({5: 6, 7: 8}, [9, 10]))
+    # do encrypted uncompressed memory serialization test
+    crypto_key = b'LRtw2A4U9PAtihUow5p_eQex6IYKM7nUoPlf1fkKPgc='  # cspell:disable-line
+    serial = base.BinSerialize(({10: 9, 8: 7}, {6, 5}), compress=False, key=crypto_key)
+    obj = base.BinDeSerialize(serial, compress=False, key=crypto_key)
+    self.assertTupleEqual(obj, ({10: 9, 8: 7}, {6, 5}))
+    # do encrypted and compressed memory serialization test
+    serial = base.BinSerialize(({100: 90, 80: 70}, {60, 50}), compress=True, key=crypto_key)
+    obj = base.BinDeSerialize(serial, key=crypto_key)
+    self.assertTupleEqual(obj, ({100: 90, 80: 70}, {60, 50}))
+    # do compressed disk serialization test
     with tempfile.TemporaryDirectory() as tmpdir:
       tmp_file = os.path.join(tmpdir, f'base_test.test_Serialize.{int(time.time())}')
       base.BinSerialize(({4: 3, 2: 1}, [None, 7]), file_path=tmp_file)
