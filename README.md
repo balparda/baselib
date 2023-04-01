@@ -29,6 +29,8 @@ $ git clone https://github.com/balparda/baselib.git
 $ sudo apt-get install python3-pip pylint3 cryptography
 ```
 
+Docs for crypto: https://cryptography.io/en/latest/
+
 ## Usage
 
 Import into your project and use the utilities. Just by importing

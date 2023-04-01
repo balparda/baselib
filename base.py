@@ -264,6 +264,8 @@ def DeriveKeyFromStaticPassword(str_password: str) -> bytes:
   ON THE OTHER HAND, this only serves the purpose of generating keys from static passwords.
   NEVER use this method to save a database of keys. ONLY use it for direct user input.
 
+  Docs: https://cryptography.io/en/latest/
+
   Args:
     str_password: Non-empty string password
 
@@ -299,6 +301,8 @@ class BlockEncoder256:
 
   Please DO **NOT** use this for regular cryptography. For regular crypto use Encrypt()/Decrypt().
   This class was specifically built to encode/decode SHA-256 hashes using a pre-existing key.
+
+  Docs: https://cryptography.io/en/latest/
   """
 
   def __init__(self, key256: bytes):
