@@ -5,6 +5,7 @@
 # pylint: disable=invalid-name,protected-access
 """base.py unittest."""
 
+import base64
 import os.path
 # import pdb
 import tempfile
@@ -76,6 +77,48 @@ class TestBase(unittest.TestCase):
       self.assertEqual(
           base.DeriveKeyFromStaticPassword('Ben Star Wars Jedi'),
           b'yAK_QpO2RrSqwzzO8relAbl5c_cBgvp_cVPtk1D-Hrw=')  # cspell:disable-line
+
+  def test_BasicCrypto(self):
+    """Test."""
+    crypto_key = b'LRtw2A4U9PAtihUow5p_eQex6IYKM7nUoPlf1fkKPgc='  # cspell:disable-line
+    plaintext = 'the force will be with you... always'.encode('utf-8')
+    cipher = base.Encrypt(plaintext, crypto_key)
+    self.assertEqual(base.Decrypt(cipher, crypto_key), plaintext)
+    self.assertEqual(len(cipher), 105)
+    with self.assertRaises(base.bin_fernet.InvalidToken):
+      base.Decrypt(cipher, b'0rCiyBrqWokX9UNBiYzkvhi9ZsjoIyGeUdtkbPAjzaY=')  # wrong key
+    with self.assertRaises(base.bin_fernet.InvalidToken):
+      base.Decrypt(cipher[5:], crypto_key)  # truncated ciphertext
+    with self.assertRaises(ValueError):
+      base.Encrypt(plaintext, crypto_key[10:])  # invalid key format
+
+  def test_BlockEncoder256(self):
+    """Test."""
+    crypto_key = b'LRtw2A4U9PAtihUow5p_eQex6IYKM7nUoPlf1fkKPgc='  # cspell:disable-line
+    digest = 'a771d3bd9b432b720b2bcebd3c4675d6d27d5868c5ce05261728ec9844b78a70'
+    crypt_digest = 'd2ffc6e722eb0ae2db38b52796f4a13b0f1ace0befab9cdf265771951f9f89d6'
+    bin_digest = bytes.fromhex(digest)
+    encoder = base.BlockEncoder256(base64.urlsafe_b64decode(crypto_key))
+    bin_cipher = encoder.EncryptBlock256(bin_digest)
+    self.assertEqual(bin_cipher.hex(), crypt_digest)
+    self.assertEqual(encoder.DecryptBlock256(bin_cipher), bin_digest)
+    hex_cipher = encoder.EncryptHexdigest256(digest)
+    self.assertEqual(hex_cipher, crypt_digest)
+    self.assertEqual(encoder.DecryptHexdigest256(hex_cipher), digest)
+    with self.assertRaises(base.Error):
+      base.BlockEncoder256(b'abcd')
+    with self.assertRaises(base.Error):
+      encoder.EncryptBlock256(b'abcd')
+    with self.assertRaises(base.Error):
+      encoder.DecryptBlock256(b'abcd')
+    with self.assertRaises(base.Error):
+      encoder.EncryptHexdigest256('abcd')
+    with self.assertRaises(base.Error):
+      encoder.DecryptHexdigest256('abcd')
+    with self.assertRaises(ValueError):
+      encoder.EncryptHexdigest256('abc')
+    with self.assertRaises(ValueError):
+      encoder.DecryptHexdigest256('abc')
 
   def test_Serialize(self):
     """Test."""

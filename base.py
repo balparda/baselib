@@ -28,6 +28,8 @@ import time
 import sys
 from typing import Any, Callable, Literal, Optional, Union
 
+from cryptography.hazmat.primitives import ciphers
+from cryptography.hazmat.primitives.ciphers import algorithms, modes
 from cryptography.hazmat.primitives import hashes as hazmat_hashes
 from cryptography.hazmat.primitives.kdf import pbkdf2 as hazmat_pbkdf2
 
@@ -282,6 +284,59 @@ def DeriveKeyFromStaticPassword(str_password: str) -> bytes:
   return base64.urlsafe_b64encode(crypto_key)
 
 
+def Encrypt(plaintext: bytes, key: bytes) -> bytes:
+  """Encryption wrapper."""
+  return bin_fernet.BinaryFernet(key).encrypt(plaintext)
+
+
+def Decrypt(ciphertext: bytes, key: bytes) -> bytes:
+  """Decryption wrapper."""
+  return bin_fernet.BinaryFernet(key).decrypt(ciphertext)
+
+
+class BlockEncoder256:
+  """The simplest encryption possible (UNSAFE if misused): 256 bit block AES256-ECB, 256 bit key.
+
+  Please DO **NOT** use this for regular cryptography. For regular crypto use Encrypt()/Decrypt().
+  This class was specifically built to encode/decode SHA-256 hashes using a pre-existing key.
+  """
+
+  def __init__(self, key256: bytes):
+    """Construct.
+
+    Args:
+      key256: 256 bits (32 bytes) of key material
+
+    Raises:
+      Error: invalid key
+    """
+    if len(key256) != 32:
+      raise Error('Key must be 256 bits (32 bytes) long')
+    self._cipher = ciphers.Cipher(algorithms.AES256(key256), modes.ECB())  # nosec
+
+  def EncryptBlock256(self, plaintext256: bytes) -> bytes:
+    """Encrypt a 256 bits block."""
+    if len(plaintext256) != 32:
+      raise Error('Plaintext must be 256 bits (32 bytes) long')
+    encoder = self._cipher.encryptor()  # cspell:disable-line
+    return encoder.update(plaintext256) + encoder.finalize()
+
+  def DecryptBlock256(self, ciphertext256: bytes) -> bytes:
+    """Decrypt a 256 bits block."""
+    if len(ciphertext256) != 32:
+      raise Error('Ciphertext must be 256 bits (32 bytes) long')
+    encoder = self._cipher.decryptor()  # cspell:disable-line
+    return encoder.update(ciphertext256) + encoder.finalize()
+
+  def EncryptHexdigest256(self, plaintext_hexdigest: str) -> str:
+    """Encrypt a 256 bits hexadecimal block, outputting also a 256 bits hexadecimal."""
+    return self.EncryptBlock256(bytes.fromhex(plaintext_hexdigest)).hex()
+
+  def DecryptHexdigest256(self, ciphertext_hexdigest: str) -> str:
+    """Decrypt a 256 bits hexadecimal block, outputting also a 256 bits hexadecimal."""
+    return self.DecryptBlock256(bytes.fromhex(ciphertext_hexdigest)).hex()
+
+
 def BinSerialize(
     obj: Any, file_path: Optional[str] = None,
     compress: bool = True, key: Optional[bytes] = None) -> bytes:
@@ -309,7 +364,7 @@ def BinSerialize(
     c_obj = bz2.compress(s_obj, 9) if compress else s_obj
   # encrypt, if needed
   with Timer() as tm_crypto:
-    e_obj = c_obj if key is None else bin_fernet.BinaryFernet(key).encrypt(c_obj)
+    e_obj = c_obj if key is None else Encrypt(c_obj, key)
   # output some logs, with measurements
   logging.info(
       'SERIALIZATION: %s serial (%s pickle)%s%s',
@@ -360,7 +415,7 @@ def BinDeSerialize(
     logging.info('Read bin file: %r (%s)', file_path, tm_load.readable)
   # we have the data; decrypt, if needed
   with Timer() as tm_crypto:
-    c_obj = e_obj if key is None else bin_fernet.BinaryFernet(key).decrypt(e_obj)
+    c_obj = e_obj if key is None else Decrypt(e_obj, key)
   # decompress, if needed
   with Timer() as tm_decompress:
     s_obj = bz2.decompress(c_obj) if compress else c_obj
