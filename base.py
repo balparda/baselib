@@ -431,5 +431,5 @@ def BinDeSerialize(
       'DE-SERIALIZATION: %s serial (%s pickle)%s%s',
       HumanizedBytes(len(s_obj)), tm_pickle.readable,
       f'; {HumanizedBytes(len(c_obj))} compressed ({tm_decompress.readable})' if compress else '',
-      '' if key is None else f'; {HumanizedBytes(len(e_obj))} compressed ({tm_crypto.readable})')
+      '' if key is None else f'; {HumanizedBytes(len(e_obj))} encrypted ({tm_crypto.readable})')
   return obj
