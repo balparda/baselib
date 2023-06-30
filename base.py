@@ -61,6 +61,20 @@ _TIME_FORMAT = '%Y/%b/%d-%H:%M:%S-UTC'
 # cspell:disable-next-line
 STD_TIME_STRING = lambda t: (time.strftime(_TIME_FORMAT, time.gmtime(t)) if t else '-')
 
+# terminal colors; can be compounded, but always use TERM_END to go back to default
+TERM_END = '\033[0m'  # disables colors/styles in terminal text
+# colors
+TERM_MAGENTA = '\033[95m'
+TERM_BLUE = '\033[94m'
+TERM_CYAN = '\033[96m'
+TERM_GREEN = '\033[92m'
+# reserved for warnings/errors
+TERM_WARNING = '\033[93m'  # yellow
+TERM_FAIL = '\033[91m'     # red
+# text style
+TERM_BOLD = '\033[1m'
+TERM_UNDERLINE = '\033[4m'
+
 
 class Error(Exception):
   """Base exception."""
