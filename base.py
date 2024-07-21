@@ -64,13 +64,25 @@ STD_TIME_STRING = lambda t: (time.strftime(_TIME_FORMAT, time.gmtime(t)) if t el
 # terminal colors; can be compounded, but always use TERM_END to go back to default
 TERM_END = '\033[0m'  # disables colors/styles in terminal text
 # colors
-TERM_MAGENTA = '\033[95m'
-TERM_BLUE = '\033[94m'
-TERM_CYAN = '\033[96m'
-TERM_GREEN = '\033[92m'
-# reserved for warnings/errors
-TERM_WARNING = '\033[93m'  # yellow
-TERM_FAIL = '\033[91m'     # red
+TERM_BLACK = '\033[30m'
+TERM_WHITE = '\033[97m'
+TERM_LIGHT_GRAY = '\033[37m'
+TERM_DARK_GRAY = '\033[90m'
+TERM_MAGENTA = '\033[35m'
+TERM_BLUE = '\033[34m'
+TERM_CYAN = '\033[36m'
+TERM_GREEN = '\033[32m'
+TERM_RED = '\033[31m'
+TERM_YELLOW = '\033[33m'
+TERM_LIGHT_MAGENTA = '\033[95m'
+TERM_LIGHT_BLUE = '\033[94m'
+TERM_LIGHT_CYAN = '\033[96m'
+TERM_LIGHT_GREEN = '\033[92m'
+TERM_LIGHT_RED = '\033[91m'
+TERM_LIGHT_YELLOW = '\033[93m'
+# warnings/errors
+TERM_WARNING = TERM_LIGHT_YELLOW
+TERM_FAIL = TERM_LIGHT_RED
 # text style
 TERM_BOLD = '\033[1m'
 TERM_UNDERLINE = '\033[4m'

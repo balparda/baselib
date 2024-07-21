@@ -24,7 +24,7 @@ along with this program. If not, see http://www.gnu.org/licenses/gpl-3.0.txt.
 
 Just the basics, plus crypto.
 
-```
+```bash
 $ git clone https://github.com/balparda/baselib.git
 $ sudo apt-get install python3-pip pylint3 cryptography
 ```
@@ -36,7 +36,7 @@ Docs for crypto: https://cryptography.io/en/latest/
 Import into your project and use the utilities. Just by importing
 you will set logging at `info` level to `stderr`. Some usage examples:
 
-```
+```python
 import getpass
 from baselib import base
 
