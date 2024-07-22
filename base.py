@@ -41,7 +41,7 @@ __version__ = (1, 0)
 
 # log format string
 LOG_FORMAT = '%(asctime)-15s: %(module)s/%(funcName)s/%(lineno)d: %(message)s'
-logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)  # set this as default
+# logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)  # set this as default
 
 # advanced log formats
 _LOG_FORMATS = (
@@ -58,8 +58,7 @@ PRIVATE_DIR = lambda p: '~/' + p[len(USER_DIRECTORY):] if p.startswith(USER_DIRE
 # time utils
 INT_TIME = lambda: int(time.time())
 _TIME_FORMAT = '%Y/%b/%d-%H:%M:%S-UTC'
-# cspell:disable-next-line
-STD_TIME_STRING = lambda t: (time.strftime(_TIME_FORMAT, time.gmtime(t)) if t else '-')
+STD_TIME_STRING = lambda t: (time.strftime(_TIME_FORMAT, time.gmtime(t)) if t else '-')  # cspell:disable-line
 
 # terminal colors; can be compounded, but always use TERM_END to go back to default
 TERM_END = '\033[0m'  # disables colors/styles in terminal text
@@ -86,6 +85,10 @@ TERM_FAIL = TERM_LIGHT_RED
 # text style
 TERM_BOLD = '\033[1m'
 TERM_UNDERLINE = '\033[4m'
+
+# useful
+SEPARATION_LINE = TERM_BLUE + TERM_BOLD + ('-' * 80) + TERM_END
+STRONG_SEPARATION_LINE = TERM_BLUE + TERM_BOLD + ('=' * 80) + TERM_END
 
 
 class Error(Exception):
@@ -172,7 +175,7 @@ def HumanizedSeconds(inp_secs: Union[int, float]) -> str:
   if inp_secs < 0.0:
     raise AttributeError(f'Input should be >=0 and got {inp_secs}')
   if inp_secs < 0.01:
-    return f'{inp_secs * 1000.0:0.3f} msecs'
+    return f'{inp_secs * 1000.0:0.3f} msecs'  # cspell:disable-line
   if inp_secs < 1.0:
     return f'{inp_secs:0.4f} secs'
   if inp_secs < 60.0:
