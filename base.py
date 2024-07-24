@@ -19,6 +19,7 @@
 import base64
 import bz2
 import functools
+import hashlib
 import logging
 import os
 import os.path
@@ -32,6 +33,7 @@ from cryptography.hazmat.primitives import ciphers
 from cryptography.hazmat.primitives.ciphers import algorithms, modes
 from cryptography.hazmat.primitives import hashes as hazmat_hashes
 from cryptography.hazmat.primitives.kdf import pbkdf2 as hazmat_pbkdf2
+from PIL import Image
 
 from baselib import bin_fernet
 
@@ -45,8 +47,8 @@ LOG_FORMAT = '%(asctime)-15s: %(module)s/%(funcName)s/%(lineno)d: %(message)s'
 
 # advanced log formats
 _LOG_FORMATS = (
-    '%(asctime)s.%(msecs)03d%(levelname)08s[%(funcName)s]: %(message)s',  # without process name
-    '%(asctime)s.%(msecs)03d%(levelname)08s[%(processName)s.%(funcName)s]: %(message)s',  # with prc
+    '%(asctime)s.%(msecs)03d%(levelname)08s[%(funcName)s]: %(message)s',  # without process name # cspell:disable-line
+    '%(asctime)s.%(msecs)03d%(levelname)08s[%(processName)s.%(funcName)s]: %(message)s',  # with prc # cspell:disable-line
     '%Y%m%d.%H:%M:%S',  # date format
 )
 # example '20220209.14:16:47.667    INFO[SomeMethodName]: Some message'
@@ -114,6 +116,30 @@ def StartStdErrLogging(level: int = logging.INFO, log_process: bool = False) -> 
       datefmt=_LOG_FORMATS[2])
   handler.setFormatter(formatter)
   logger.addHandler(handler)
+
+
+def BytesBinHash(data: bytes) -> bytes:
+  """SHA-256 hex hash of bytes data. Always a length 32 bytes."""
+  return hashlib.sha256(data).digest()
+
+
+def BytesHexHash(data: bytes) -> str:
+  """SHA-256 hex hash of bytes data. Always a length 64 string (32 bytes, hexadecimal)."""
+  return hashlib.sha256(data).hexdigest()
+
+
+def FileHexHash(full_path: str) -> str:
+  """SHA-256 hex hash of file on disk. Always a length 64 string (32 bytes, hexadecimal)."""
+  logging.info(f'Hashing file {full_path!r}')
+  if not os.path.exists(full_path):
+    raise ValueError(f'File {full_path!r} not found for hashing')
+  with open(full_path, 'rb') as file_obj:
+    return BytesHexHash(file_obj.read())
+
+
+def ImageHexHash(img: Image.Image) -> str:
+  """SHA-256 hex hash of internal image data (ignores metadata!). Always a length 64 string."""
+  return BytesHexHash(img.tobytes())
 
 
 def HumanizedBytes(inp_sz: int) -> str:
