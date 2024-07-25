@@ -132,7 +132,7 @@ def FileHexHash(full_path: str) -> str:
   """SHA-256 hex hash of file on disk. Always a length 64 string (32 bytes, hexadecimal)."""
   logging.info(f'Hashing file {full_path!r}')
   if not os.path.exists(full_path):
-    raise ValueError(f'File {full_path!r} not found for hashing')
+    raise Error(f'File {full_path!r} not found for hashing')
   with open(full_path, 'rb') as file_obj:
     return BytesHexHash(file_obj.read())
 
@@ -150,9 +150,12 @@ def HumanizedBytes(inp_sz: int) -> str:
 
   Returns:
     human-readable length for inp_sz
+
+  Raises:
+    Error: negative size
   """
   if inp_sz < 0:
-    raise AttributeError(f'Input should be >=0 and got {inp_sz}')
+    raise Error(f'Input should be >=0 and got {inp_sz}')
   if inp_sz < 1024:
     return f'{inp_sz}b'
   if inp_sz < 1024 * 1024:
@@ -172,9 +175,12 @@ def HumanizedDecimal(inp_sz: int) -> str:
 
   Returns:
     human-readable length of decimal inp_sz
+
+  Raises:
+    Error: negative size
   """
   if inp_sz < 0:
-    raise AttributeError(f'Input should be >=0 and got {inp_sz}')
+    raise Error(f'Input should be >=0 and got {inp_sz}')
   if inp_sz < 1000:
     return str(inp_sz)
   if inp_sz < 1000 * 1000:
@@ -194,12 +200,15 @@ def HumanizedSeconds(inp_secs: Union[int, float]) -> str:
 
   Returns:
     human-readable time from the give number of seconds (inp_secs)
+
+  Raises:
+    Error: negative value
   """
   if inp_secs == 0:
     return '0 secs'
   inp_secs = float(inp_secs)
   if inp_secs < 0.0:
-    raise AttributeError(f'Input should be >=0 and got {inp_secs}')
+    raise Error(f'Input should be >=0 and got {inp_secs}')
   if inp_secs < 0.01:
     return f'{inp_secs * 1000.0:0.3f} msecs'  # cspell:disable-line
   if inp_secs < 1.0:
@@ -370,20 +379,20 @@ class BlockEncoder256:
       Error: invalid key
     """
     if len(key256) != 32:
-      raise Error('Key must be 256 bits (32 bytes) long')
+      raise Error(f'Key must be 256 bits (32 bytes) long, got {len(key256)}')
     self._cipher = ciphers.Cipher(algorithms.AES256(key256), modes.ECB())  # nosec
 
   def EncryptBlock256(self, plaintext256: bytes) -> bytes:
     """Encrypt a 256 bits block."""
     if len(plaintext256) != 32:
-      raise Error('Plaintext must be 256 bits (32 bytes) long')
+      raise Error(f'Plaintext must be 256 bits (32 bytes) long, got {len(plaintext256)}')
     encoder = self._cipher.encryptor()  # cspell:disable-line
     return encoder.update(plaintext256) + encoder.finalize()
 
   def DecryptBlock256(self, ciphertext256: bytes) -> bytes:
     """Decrypt a 256 bits block."""
     if len(ciphertext256) != 32:
-      raise Error('Ciphertext must be 256 bits (32 bytes) long')
+      raise Error(f'Ciphertext must be 256 bits (32 bytes) long, got {len(ciphertext256)}')
     encoder = self._cipher.decryptor()  # cspell:disable-line
     return encoder.update(ciphertext256) + encoder.finalize()
 
@@ -458,6 +467,9 @@ def BinDeSerialize(
   Returns:
     De-Serialized Python object corresponding to data; None if `file_name` is
     given and does not exist in config dir
+
+  Raises:
+    Error: file not found
   """
   if file_path is None:
     # no disk operation needed
