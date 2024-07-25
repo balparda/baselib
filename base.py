@@ -20,6 +20,7 @@ import base64
 import bz2
 import functools
 import hashlib
+import json
 import logging
 import os
 import os.path
@@ -97,6 +98,9 @@ class Error(Exception):
   """Base exception."""
 
 
+JsonType = dict[str, Union[None, int, str, bool, float, list[Any], dict[str, Any]]]
+
+
 def StartStdErrLogging(level: int = logging.INFO, log_process: bool = False) -> None:
   """Start logging to stderr.
 
@@ -116,6 +120,26 @@ def StartStdErrLogging(level: int = logging.INFO, log_process: bool = False) -> 
       datefmt=_LOG_FORMATS[2])
   handler.setFormatter(formatter)
   logger.addHandler(handler)
+
+
+def JsonToString(obj: JsonType, human_readable: bool = True) -> str:
+  """Convert JSON to string, either compact or with indentation (human_readable True, default)."""
+  return json.dumps(obj, indent=4 if human_readable else None)
+
+
+def JsonToBytes(obj: JsonType) -> bytes:
+  """Convert JSON to bytes."""
+  return json.dumps(obj).encode('utf-8')
+
+
+def StringToJson(obj: str) -> JsonType:
+  """Convert string to JSON."""
+  return json.loads(obj)
+
+
+def BytesToJson(obj: bytes) -> JsonType:
+  """Convert bytes to JSON."""
+  return json.loads(obj.decode('utf-8'))
 
 
 def BytesBinHash(data: bytes) -> bytes:
