@@ -43,25 +43,26 @@ __version__ = (1, 0)
 
 
 # log format string
-LOG_FORMAT = '%(asctime)-15s: %(module)s/%(funcName)s/%(lineno)d: %(message)s'
+LOG_FORMAT: str = '%(asctime)-15s: %(module)s/%(funcName)s/%(lineno)d: %(message)s'
 # logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)  # set this as default
 
 # advanced log formats
-_LOG_FORMATS = (
+_LOG_FORMATS: list[str] = [
     '%(asctime)s.%(msecs)03d%(levelname)08s[%(funcName)s]: %(message)s',  # without process name # cspell:disable-line
     '%(asctime)s.%(msecs)03d%(levelname)08s[%(processName)s.%(funcName)s]: %(message)s',  # with prc # cspell:disable-line
     '%Y%m%d.%H:%M:%S',  # date format
-)
+]
 # example '20220209.14:16:47.667    INFO[SomeMethodName]: Some message'
 
 # user directory
-USER_DIRECTORY = os.path.expanduser('~/')
-PRIVATE_DIR = lambda p: '~/' + p[len(USER_DIRECTORY):] if p.startswith(USER_DIRECTORY) else p
+USER_DIRECTORY: str = os.path.expanduser('~/')
+PRIVATE_DIR: Callable[[str], str] = lambda p: '~/' + p[len(USER_DIRECTORY):] if p.startswith(USER_DIRECTORY) else p
 
 # time utils
-INT_TIME = lambda: int(time.time())
-_TIME_FORMAT = '%Y/%b/%d-%H:%M:%S-UTC'
-STD_TIME_STRING = lambda t: (time.strftime(_TIME_FORMAT, time.gmtime(t)) if t else '-')  # cspell:disable-line
+_TIME_FORMAT: str = '%Y/%b/%d-%H:%M:%S-UTC'
+STD_TIME_STRING: Callable[[int | float], str] = lambda t: (time.strftime(_TIME_FORMAT, time.gmtime(t)) if t else '-')  # cspell:disable-line
+INT_TIME: Callable[[], int] = lambda: int(time.time())
+STR_TIME: Callable[[], str] = lambda: STD_TIME_STRING(INT_TIME())
 
 # terminal colors; can be compounded, but always use TERM_END to go back to default
 TERM_END = '\033[0m'  # disables colors/styles in terminal text
@@ -90,8 +91,8 @@ TERM_BOLD = '\033[1m'
 TERM_UNDERLINE = '\033[4m'
 
 # useful
-SEPARATION_LINE = TERM_BLUE + TERM_BOLD + ('-' * 80) + TERM_END
-STRONG_SEPARATION_LINE = TERM_BLUE + TERM_BOLD + ('=' * 80) + TERM_END
+SEPARATION_LINE: str = TERM_BLUE + TERM_BOLD + ('-' * 80) + TERM_END
+STRONG_SEPARATION_LINE: str = TERM_BLUE + TERM_BOLD + ('=' * 80) + TERM_END
 
 
 class Error(Exception):
@@ -111,7 +112,7 @@ def StartStdErrLogging(level: int = logging.INFO, log_process: bool = False) -> 
     log_process: (default False) If True will add process names to log strings (as in the process
         `multiprocessing.Process(name=[some_name])` call)
   """
-  logger = logging.getLogger()
+  logger: logging.Logger = logging.getLogger()
   logger.setLevel(level)
   handler = logging.StreamHandler(sys.stdout)
   handler.setLevel(level)
@@ -154,7 +155,7 @@ def BytesHexHash(data: bytes) -> str:
 
 def FileHexHash(full_path: str) -> str:
   """SHA-256 hex hash of file on disk. Always a length 64 string (32 bytes, hexadecimal)."""
-  logging.info(f'Hashing file {full_path!r}')
+  logging.info('Hashing file %r', full_path)
   if not os.path.exists(full_path):
     raise Error(f'File {full_path!r} not found for hashing')
   with open(full_path, 'rb') as file_obj:
@@ -274,14 +275,14 @@ class Timer:
     """
     self._start: Optional[float] = None
     self._end: Optional[float] = None
-    self._log = log
+    self._log: Optional[str] = log
 
   def __enter__(self) -> Any:
     """Enter Timed context. Starts the timer."""
     self._start = time.time()
     return self
 
-  def __exit__(self, exc_type, exc_val, exc_tb) -> Literal[False]:
+  def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> Literal[False]:
     """Exit Timed context. Will stop the timer and will log if necessary."""
     _ = self.partial
     return False  # do not stop exceptions from propagating!
@@ -309,13 +310,13 @@ class Timer:
   def partial(self) -> str:
     """Stores an end time (and will log if necessary)."""
     self._end = time.time()
-    readable = self.readable
+    readable: str = self.readable
     if self._log is not None:
       logging.info('%s: %s', self._log, readable)
     return readable
 
 
-def Timed(log: Optional[str] = None) -> Callable:
+def Timed(log: Optional[str] = None) -> Callable[[Callable[[Any], Any]], Callable[[Any], Any]]:
   """Make any call print its execution time, to be used as a decorator.
 
   Args:
@@ -323,11 +324,11 @@ def Timed(log: Optional[str] = None) -> Callable:
         if not given will use the decorated method name for a simple message
   """
 
-  def _Timed(func: Callable) -> Callable:
+  def _Timed(func: Callable[[Any], Any]) -> Callable[[Any], Any]:
 
     @functools.wraps(func)
-    def _WrappedCall(*args, **kwargs):
-      log_message = f'{(func.__name__ + "()") if log is None else log!r} execution time'
+    def _WrappedCall(*args: list[Any], **kwargs: dict[Any, Any]) -> Any:
+      log_message: str = f'{(func.__name__ + "()") if log is None else log!r} execution time'
       with Timer(log=log_message):
         return func(*args, **kwargs)
 
@@ -370,7 +371,7 @@ def DeriveKeyFromStaticPassword(str_password: str) -> bytes:
       length=32,
       salt=b'\xda4,92\x80\x88\xf1\xc8\x18x@Q\x95*&',  # fixed salt: do NOT ever change!
       iterations=1745202)                             # fixed iterations: do NOT ever change!
-  crypto_key = kdf.derive(str_password.encode('utf-8'))
+  crypto_key: bytes = kdf.derive(str_password.encode('utf-8'))
   return base64.urlsafe_b64encode(crypto_key)
 
 
@@ -393,7 +394,7 @@ class BlockEncoder256:
   Docs: https://cryptography.io/en/latest/
   """
 
-  def __init__(self, key256: bytes):
+  def __init__(self, key256: bytes) -> None:
     """Construct.
 
     Args:
@@ -410,14 +411,14 @@ class BlockEncoder256:
     """Encrypt a 256 bits block."""
     if len(plaintext256) != 32:
       raise Error(f'Plaintext must be 256 bits (32 bytes) long, got {len(plaintext256)}')
-    encoder = self._cipher.encryptor()  # cspell:disable-line
+    encoder: ciphers.CipherContext = self._cipher.encryptor()  # cspell:disable-line
     return encoder.update(plaintext256) + encoder.finalize()
 
   def DecryptBlock256(self, ciphertext256: bytes) -> bytes:
     """Decrypt a 256 bits block."""
     if len(ciphertext256) != 32:
       raise Error(f'Ciphertext must be 256 bits (32 bytes) long, got {len(ciphertext256)}')
-    encoder = self._cipher.decryptor()  # cspell:disable-line
+    encoder: ciphers.CipherContext = self._cipher.decryptor()  # cspell:disable-line
     return encoder.update(ciphertext256) + encoder.finalize()
 
   def EncryptHexdigest256(self, plaintext_hexdigest: str) -> str:
@@ -450,13 +451,13 @@ def BinSerialize(
   """
   # serialize
   with Timer() as tm_pickle:
-    s_obj = pickle.dumps(obj, protocol=-1)
+    s_obj: bytes = pickle.dumps(obj, protocol=-1)
   # compress, if needed
   with Timer() as tm_compress:
-    c_obj = bz2.compress(s_obj, 9) if compress else s_obj
+    c_obj: bytes = bz2.compress(s_obj, 9) if compress else s_obj
   # encrypt, if needed
   with Timer() as tm_crypto:
-    e_obj = c_obj if key is None else Encrypt(c_obj, key)
+    e_obj: bytes = c_obj if key is None else Encrypt(c_obj, key)
   # output some logs, with measurements
   logging.info(
       'SERIALIZATION: %s serial (%s pickle)%s%s',
@@ -499,7 +500,7 @@ def BinDeSerialize(
     # no disk operation needed
     if data is None:
       return None
-    e_obj = data
+    e_obj: bytes = data
   else:
     # load data from disk
     if not os.path.exists(file_path):
@@ -510,13 +511,13 @@ def BinDeSerialize(
     logging.info('Read bin file: %r (%s)', file_path, tm_load.readable)
   # we have the data; decrypt, if needed
   with Timer() as tm_crypto:
-    c_obj = e_obj if key is None else Decrypt(e_obj, key)
+    c_obj: bytes = e_obj if key is None else Decrypt(e_obj, key)
   # decompress, if needed
   with Timer() as tm_decompress:
-    s_obj = bz2.decompress(c_obj) if compress else c_obj
+    s_obj: bytes = bz2.decompress(c_obj) if compress else c_obj
   # create the actual object
   with Timer() as tm_pickle:
-    obj = pickle.loads(s_obj)  # nosec - this is dangerous!
+    obj: Any = pickle.loads(s_obj)  # nosec - this is dangerous!
   # output some logs, with measurements
   logging.info(
       'DE-SERIALIZATION: %s serial (%s pickle)%s%s',
