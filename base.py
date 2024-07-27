@@ -60,7 +60,8 @@ PRIVATE_DIR: Callable[[str], str] = lambda p: '~/' + p[len(USER_DIRECTORY):] if 
 
 # time utils
 _TIME_FORMAT: str = '%Y/%b/%d-%H:%M:%S-UTC'
-STD_TIME_STRING: Callable[[int | float], str] = lambda t: (time.strftime(_TIME_FORMAT, time.gmtime(t)) if t else '-')  # cspell:disable-line
+STD_TIME_STRING: Callable[[Union[int, float]], str] = lambda t: (
+    time.strftime(_TIME_FORMAT, time.gmtime(t)) if t else '-')  # cspell:disable-line
 INT_TIME: Callable[[], int] = lambda: int(time.time())
 STR_TIME: Callable[[], str] = lambda: STD_TIME_STRING(INT_TIME())
 
@@ -284,7 +285,7 @@ class Timer:
 
   def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> Literal[False]:
     """Exit Timed context. Will stop the timer and will log if necessary."""
-    _ = self.partial
+    _: str = self.partial
     return False  # do not stop exceptions from propagating!
 
   @property
