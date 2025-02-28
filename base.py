@@ -54,9 +54,16 @@ _LOG_FORMATS: list[str] = [
 ]
 # example '20220209.14:16:47.667    INFO[SomeMethodName]: Some message'
 
-# user directory
+# user directories
 USER_DIRECTORY: str = os.path.expanduser('~/')
-PRIVATE_DIR: Callable[[str], str] = lambda p: '~/' + p[len(USER_DIRECTORY):] if p.startswith(USER_DIRECTORY) else p
+EXECUTION_DIRECTORY: str = os.getcwd()
+# get a private directory in user root directory: PRIVATE_DIR('.cache')
+PRIVATE_DIR: Callable[[str], str] = lambda p: os.path.join(
+    USER_DIRECTORY, p[len(USER_DIRECTORY):] if p.startswith(USER_DIRECTORY) else p)
+# get module directory: MODULE_DIR(__file__)
+MODULE_DIR: Callable[[str], str] = lambda f: os.path.dirname(os.path.realpath(f))
+# get module private directory (remember to .gitignore): MODULE_PRIVATE_DIR(__file__, '.cache')
+MODULE_PRIVATE_DIR: Callable[[str, str], str] = lambda f, p: os.path.join(MODULE_DIR(f), p)
 
 # time utils
 _TIME_FORMAT: str = '%Y/%b/%d-%H:%M:%S-UTC'
@@ -267,7 +274,7 @@ class Timer:
   See also the Timed() decorator below.
   """
 
-  def __init__(self, log: Optional[str] = None):
+  def __init__(self, log: Optional[str] = None) -> None:
     """Construct.
 
     Args:
@@ -432,7 +439,7 @@ class BlockEncoder256:
 
 
 def BinSerialize(
-    obj: Any, file_path: Optional[str] = None,
+    obj: Any, /, file_path: Optional[str] = None,
     compress: bool = True, key: Optional[bytes] = None) -> bytes:
   """Serialize a Python object into a BLOB.
 
