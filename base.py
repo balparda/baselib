@@ -152,7 +152,7 @@ def BytesToJson(obj: bytes) -> JsonType:
 
 
 def BytesBinHash(data: bytes) -> bytes:
-  """SHA-256 hex hash of bytes data. Always a length 32 bytes."""
+  """SHA-256 hash of bytes data. Always a length 32 bytes."""
   return hashlib.sha256(data).digest()
 
 
@@ -172,7 +172,7 @@ def FileHexHash(full_path: str) -> str:
 
 def ImageHexHash(img: Image.Image) -> str:
   """SHA-256 hex hash of internal image data (ignores metadata!). Always a length 64 string."""
-  return BytesHexHash(img.tobytes())
+  return BytesHexHash(img.tobytes())  # type:ignore
 
 
 def HumanizedBytes(inp_sz: int) -> str:
