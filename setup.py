@@ -20,13 +20,13 @@ def _ReadRequirements() -> list[str]:
 
 setuptools.setup(
     name='baselib',
-    version='1.1',
-    description='A base library for various utilities.',
+    version='1.1.1',
+    description='A base library for various utilities',
     author='Daniel Balparda',
     author_email='balparda@gmail.com',
     license='GPL-3.0-or-later',
     packages=setuptools.find_packages(
-        include=['baselib', 'baselib.*']  # adjust if needed
+        include=['baselib', 'baselib.*']
     ),
     include_package_data=True,
     install_requires=_ReadRequirements(),

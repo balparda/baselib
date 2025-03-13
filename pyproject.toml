@@ -4,20 +4,18 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "baselib"
-version = "1.1"
-description = "A base library for various utilities."
+version = "1.1.1"
+description = "A base library for various utilities"
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [
   { name = "Daniel Balparda", email = "balparda@gmail.com" }
 ]
-# we might keep this empty and rely on setup.py or an external file for dependencies...
+requires-python = ">=3.9"
 dependencies = [
   "cryptography>=41.0.7",
   "Pillow>=10.2.0",
 ]
-
-requires-python = ">=3.9"
 
 [project.urls]
 # "Homepage" = "https://example.com/baselib"
