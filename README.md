@@ -31,6 +31,21 @@ $ sudo apt-get install python3-pip pylint3 cryptography
 
 Docs for crypto: https://cryptography.io/en/latest/
 
+Or with virtual environment:
+
+```bash
+cd baselib
+python3 -m venv .base-venv
+source .base-venv/bin/activate
+
+pip install --upgrade pip
+pip install -r requirements.txt
+
+./base_test.py
+
+deactivate
+```
+
 ## Usage
 
 Import into your project and use the utilities. Just by importing
