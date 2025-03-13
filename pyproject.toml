@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=58.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "baselib"
+version = "1.1"
+description = "A base library for various utilities."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Daniel Balparda", email = "balparda@gmail.com" }
+]
+# we might keep this empty and rely on setup.py or an external file for dependencies...
+dependencies = [
+  "cryptography>=41.0.7",
+  "Pillow>=10.2.0",
+]
+
+requires-python = ">=3.9"
+
+[project.urls]
+# "Homepage" = "https://example.com/baselib"
+"Source"   = "https://github.com/balparda/baselib"
+# "Tracker"  = "https://github.com/balparda/baselib/issues"
+
+[tool.setuptools.packages.find]
+include = ["baselib"]
+exclude = [
+  "baselib.base_test",
+  "htmlcov",
+  "__pycache__",
+  "*.pyc"
+]
