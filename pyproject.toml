@@ -1,10 +1,12 @@
+# pyproject.toml  (preferred for new projects, PEP 621)
+
 [build-system]
-requires = ["setuptools>=58.0", "wheel"]
+requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "baselib"
-version = "1.1.1"
+version = "1.1.2"
 description = "A base library for various utilities"
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -14,19 +16,10 @@ authors = [
 requires-python = ">=3.9"
 dependencies = [
   "cryptography>=41.0.7",
-  "Pillow>=10.2.0",
+  "Pillow>=10.2.0"
 ]
 
-[project.urls]
-# "Homepage" = "https://example.com/baselib"
-"Source"   = "https://github.com/balparda/baselib"
-# "Tracker"  = "https://github.com/balparda/baselib/issues"
-
-[tool.setuptools.packages.find]
-include = ["baselib"]
-exclude = [
-  "baselib.base_test",
-  "htmlcov",
-  "__pycache__",
-  "*.pyc"
-]
+# test with:
+# $ python3
+# >>> import sys, tomli, pathlib
+# >>> tomli.loads(pathlib.Path('pyproject.toml').read_text())

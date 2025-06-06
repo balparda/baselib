@@ -39,7 +39,7 @@ from PIL import Image
 from baselib import bin_fernet
 
 __author__ = 'balparda@gmail.com (Daniel Balparda)'
-__version__ = (1, 1)  # v1.1, 2025-03-13
+__version__ = (1, 1, 2)  # v1.1.2, 2025-06-06
 
 
 # log format string
