@@ -1,6 +1,6 @@
-#!/usr/bin/python3 -bb
+#!/usr/bin/env python3
 #
-# Copyright 2023 Daniel Balparda (balparda@gmail.com)
+# Copyright 2023-2025 Daniel Balparda (balparda@gmail.com)
 #
 # pylint: disable=invalid-name,protected-access
 """base.py unittest."""
@@ -19,7 +19,7 @@ from unittest import mock
 from baselib import base
 
 __author__ = 'balparda@gmail.com (Daniel Balparda)'
-__version__ = (1, 1)
+__version__ = (1, 3)
 
 
 class TestBase(unittest.TestCase):

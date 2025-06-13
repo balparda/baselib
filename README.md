@@ -6,7 +6,7 @@ Started in January/2023, by Daniel Balparda.
 
 ## License
 
-Copyright (C) 2023 Daniel Balparda (balparda@gmail.com).
+Copyright (C) 2023-2025 Daniel Balparda (balparda@gmail.com).
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,29 +22,23 @@ along with this program. If not, see http://www.gnu.org/licenses/gpl-3.0.txt.
 
 ## Setup
 
-Just the basics, plus crypto.
-
 ```bash
-$ git clone https://github.com/balparda/baselib.git
-$ sudo apt-get install python3-pip pylint3 cryptography
-```
+brew install git uv python@3.13
 
-Docs for crypto: https://cryptography.io/en/latest/
-
-Or with virtual environment:
-
-```bash
+git clone https://github.com/balparda/baselib.git baselib
 cd baselib
-python3 -m venv .base-venv
-source .base-venv/bin/activate
 
-pip install --upgrade pip
-pip install -r requirements.txt
+uv venv --python 3.13
+source .venv/bin/activate
+uv pip install --upgrade pip
+uv pip install -r requirements.txt
 
 ./base_test.py
 
 deactivate
 ```
+
+Docs for crypto: https://cryptography.io/en/latest/
 
 ## Usage
 

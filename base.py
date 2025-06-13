@@ -1,6 +1,6 @@
-#!/usr/bin/python3 -O
+#!/usr/bin/env python3
 #
-# Copyright 2023 Daniel Balparda (balparda@gmail.com)
+# Copyright 2023-2025 Daniel Balparda (balparda@gmail.com)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License 3 as published by
@@ -39,7 +39,7 @@ from PIL import Image
 from baselib import bin_fernet
 
 __author__ = 'balparda@gmail.com (Daniel Balparda)'
-__version__ = (1, 2)  # v1.2, 2025-06-06
+__version__ = (1, 3)  # v1.3, 2025-06-13
 
 
 # log format string

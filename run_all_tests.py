@@ -1,6 +1,6 @@
-#!/usr/bin/python3 -bb
+#!/usr/bin/env python3
 #
-# Copyright 2023 Daniel Balparda (balparda@gmail.com)
+# Copyright 2023-2025 Daniel Balparda (balparda@gmail.com)
 #
 """Run all the tests so we can have easy global coverage."""
 
@@ -11,7 +11,7 @@ from baselib import base
 from baselib import base_test
 
 __author__ = 'balparda@gmail.com (Daniel Balparda)'
-__version__ = (1, 0)
+__version__ = (1, 3)
 
 
 _TEST_MODULES_TO_RUN: tuple[types.ModuleType] = (
@@ -32,6 +32,6 @@ def Main() -> None:
   logging.info('*' * 80)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   logging.basicConfig(level=logging.INFO, format=base.LOG_FORMAT)  # set this as default
   Main()  # type:ignore
