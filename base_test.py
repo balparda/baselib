@@ -19,7 +19,7 @@ from unittest import mock
 from baselib import base
 
 __author__ = 'balparda@gmail.com (Daniel Balparda)'
-__version__ = (1, 3)
+__version__ = (1, 4)
 
 
 class TestBase(unittest.TestCase):
