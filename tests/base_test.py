@@ -294,9 +294,6 @@ class TestBase(unittest.TestCase):
     _tm()  # type:ignore
 
 
-SUITE: unittest.TestSuite = unittest.TestLoader().loadTestsFromTestCase(TestBase)
-
-
 if __name__ == '__main__':
   logging.basicConfig(level=logging.INFO, format=base.LOG_FORMAT)  # set this as default
   unittest.main()
