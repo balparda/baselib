@@ -36,7 +36,7 @@ from cryptography.hazmat.primitives import hashes as hazmat_hashes
 from cryptography.hazmat.primitives.kdf import pbkdf2 as hazmat_pbkdf2
 from PIL import Image
 
-from baselib import bin_fernet
+from . import bin_fernet
 
 __author__ = 'balparda@gmail.com (Daniel Balparda)'
 __version__ = (1, 4)  # v1.4, 2025-06-14

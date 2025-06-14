@@ -1,4 +1,6 @@
 
+pytest
+pytest-pythonpath
 coverage>=7.8.2
 tomli>=2.2.1
 

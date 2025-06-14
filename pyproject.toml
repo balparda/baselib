@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "baselib"
-version = "1.4"
+version = "1.5"
 description = "A base library for various utilities"
 readme = "README.md"
 license = "GPL-3.0-or-later"
@@ -16,11 +16,25 @@ authors = [
 ]
 requires-python = ">=3.13.5"
 dependencies = [
+  "pytest",
+  "pytest-pythonpath",
   "coverage>=7.8.2",
   "tomli>=2.2.1",
   "cryptography>=41.0.7",
   "Pillow>=10.2.0"
 ]
+
+[tool.setuptools]
+package-dir = {"" = "src"}   # root package namespace lives in src/
+
+[tool.setuptools.packages.find]
+where = ["src"]  # auto-discover every importable package inside src/
+
+[tool.setuptools.package-data]
+"baselib" = ["py.typed"]
+
+[pytest]
+pythonpath = ["src"]
 
 # test with:
 # $ python3

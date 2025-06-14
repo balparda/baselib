@@ -16,7 +16,7 @@ import time
 import unittest
 from unittest import mock
 
-from baselib import base
+from src.baselib import base  # pylint: disable=import-error
 
 __author__ = 'balparda@gmail.com (Daniel Balparda)'
 __version__ = (1, 4)
@@ -28,7 +28,7 @@ class TestBase(unittest.TestCase):
   def test_StartStdErrLogging_default(self) -> None:
     """Test."""
     # Capture stdout to verify logging output
-    with mock.patch('baselib.base.sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
       # Reset logger handlers to avoid interference from prior tests
       logger: logging.Logger = logging.getLogger()
       logger.handlers = []

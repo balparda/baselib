@@ -48,7 +48,7 @@ class BinaryFernet:
     return self._encrypt_from_parts(data, current_time, iv)
 
   def _encrypt_from_parts(self, data: bytes, current_time: int, iv: bytes) -> bytes:
-    utils._check_bytes("data", data)
+    utils._check_bytes("data", data)  # type: ignore
 
     padder = padding.PKCS7(algorithms.AES.block_size).padder()  # type: ignore
     padded_data = padder.update(data) + padder.finalize()
