@@ -12,7 +12,7 @@ readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 authors = [
-  { name = "Daniel Balparda", email = "balparda@gmail.com" }
+  { name = "Daniel Balparda", email = "balparda@github.com" }
 ]
 requires-python = ">=3.13.5"
 dependencies = [

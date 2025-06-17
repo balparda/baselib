@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright 2025 Daniel Balparda (balparda@gmail.com) - Apache-2.0 license
+# Copyright 2025 Daniel Balparda (balparda@github.com) - Apache-2.0 license
 #
 """Balparda's base library of util methods and classes."""
 
@@ -26,7 +26,7 @@ from PIL import Image
 
 from . import bin_fernet
 
-__author__ = 'balparda@gmail.com (Daniel Balparda)'
+__author__ = 'balparda@github.com'
 __version__ = (1, 6)  # v1.6, 2025-06-17
 
 

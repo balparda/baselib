@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright 2025 Daniel Balparda (balparda@gmail.com) - Apache-2.0 license
+# Copyright 2025 Daniel Balparda (balparda@github.com) - Apache-2.0 license
 #
 # pylint: disable=invalid-name,protected-access
 """base.py unittest."""
@@ -18,7 +18,7 @@ from unittest import mock
 
 from src.baselib import base  # pylint: disable=import-error
 
-__author__ = 'balparda@gmail.com (Daniel Balparda)'
+__author__ = 'balparda@github.com (Daniel Balparda)'
 __version__ = (1, 6)
 
 
