@@ -25,7 +25,7 @@ If you want to develop for this project, first install
 sure it is like this:
 
 ```sh
-bre uninstall poetry
+brew uninstall poetry
 python3.13 -m pip install --user pipx
 python3.13 -m pipx ensurepath
 # re-open terminal
@@ -67,6 +67,14 @@ To update `poetry.lock` file to more current versions:
 ```sh
 poetry update  # ignores current lock, updates, rewrites `poetry.lock` file
 poetry run pytest
+```
+
+To update a version do:
+
+```sh
+poetry version minor  # updates 1.6 to 1.7, for example
+
+poetry build
 ```
 
 To add a new dependency you should:

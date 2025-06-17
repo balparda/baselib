@@ -16,7 +16,7 @@ import time
 import unittest
 from unittest import mock
 
-from src.baselib import base  # pylint: disable=import-error
+from src.balparda_baselib import base
 
 __author__ = 'balparda@github.com (Daniel Balparda)'
 __version__ = (1, 6)

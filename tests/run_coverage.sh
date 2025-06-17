@@ -5,6 +5,6 @@
 # https://coverage.readthedocs.io/
 #
 
-python3 -m coverage run --omit=__init__.py,*_test.py,*_tests.py,*/dist-packages/*,*/site-packages/* -m pytest
-python3 -m coverage report -m
-python3 -m coverage html
+poetry run python3 -m coverage run --omit=__init__.py,*_test.py,*_tests.py,*/dist-packages/*,*/site-packages/* -m pytest
+poetry run python3 -m coverage report -m
+poetry run python3 -m coverage html
