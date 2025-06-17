@@ -31,6 +31,7 @@ python3.13 -m pipx ensurepath
 # re-open terminal
 poetry self add poetry-plugin-export@^1.8  # allows export to requirements.txt (see below)
 poetry config virtualenvs.in-project true  # creates venv inside project directory
+poetry config pypi-token.pypi <TOKEN>      # add you personal project token
 ```
 
 Now install the project:
