@@ -29,7 +29,8 @@ brew uninstall poetry
 python3.13 -m pip install --user pipx
 python3.13 -m pipx ensurepath
 # re-open terminal
-poetry self add poetry-plugin-export@^1.8
+poetry self add poetry-plugin-export@^1.8  # allows export to requirements.txt (see below)
+poetry config virtualenvs.in-project true  # creates venv inside project directory
 ```
 
 Now install the project:
@@ -55,7 +56,8 @@ To activate like a regular environment do:
 ```sh
 poetry env activate
 # will print activation command which you next execute, or you can do:
-source "$(poetry env info --path)/bin/activate"
+source .env/bin/activate                         # if .env is local to the project
+source "$(poetry env info --path)/bin/activate"  # for other paths
 
 pytest
 
@@ -67,14 +69,6 @@ To update `poetry.lock` file to more current versions:
 ```sh
 poetry update  # ignores current lock, updates, rewrites `poetry.lock` file
 poetry run pytest
-```
-
-To update a version do:
-
-```sh
-poetry version minor  # updates 1.6 to 1.7, for example
-
-poetry build
 ```
 
 To add a new dependency you should:
@@ -93,7 +87,29 @@ poetry install  # sync your virtualenv to match the new lock file
 poetry export --format requirements.txt --without-hashes --output requirements.txt
 ```
 
-To remove an environment:
+To update a version do:
+
+```sh
+# bump the version!
+poetry version minor  # updates 1.6 to 1.7, for example
+# or:
+poetry version patch  # updates 1.6 to 1.6.1
+# or:
+poetry version <version-number>
+# (also updates `pyproject.toml` and `poetry.lock`)
+
+# publish to GIT, including a TAG
+git commit -a -m "release version 1.7"
+git tag 1.7
+git push
+git push --tags
+
+# prepare package for PyPI
+poetry build
+poetry publish
+```
+
+To remove an environment from your machine:
 
 ```sh
 poetry env list
