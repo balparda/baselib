@@ -19,7 +19,7 @@ from unittest import mock
 from src.baselib import base  # pylint: disable=import-error
 
 __author__ = 'balparda@gmail.com (Daniel Balparda)'
-__version__ = (1, 4)
+__version__ = (1, 6)
 
 
 class TestBase(unittest.TestCase):
@@ -296,4 +296,4 @@ class TestBase(unittest.TestCase):
 
 if __name__ == '__main__':
   logging.basicConfig(level=logging.INFO, format=base.LOG_FORMAT)  # set this as default
-  unittest.main()
+  unittest.main(verbosity=2)
