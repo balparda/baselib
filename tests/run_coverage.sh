@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright 2023-2025 Daniel Balparda (balparda@gmail.com)
+# Copyright 2025 Daniel Balparda (balparda@gmail.com) - Apache-2.0 license
 #
 # https://coverage.readthedocs.io/
 #

@@ -4,7 +4,8 @@ All algorithm just like in https://cryptography.io/en/latest/fernet/#cryptograph
 except the base64 conversions on input and output. For my use case they amount to a large
 time delay. The key is still base64, only input/output were touched.
 
-This code is Apache License, Version 2.0, in the original.
+Copyright 2025 Daniel Balparda (balparda@gmail.com) - Apache-2.0 license
+This code was Apache License, Version 2.0, in the original.
 """
 # pylint: disable=invalid-name,missing-function-docstring,protected-access,raise-missing-from
 # cspell:disable

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright 2023-2025 Daniel Balparda (balparda@gmail.com)
+# Copyright 2025 Daniel Balparda (balparda@gmail.com) - Apache-2.0 license
 #
 # pylint: disable=invalid-name,protected-access
 """base.py unittest."""
