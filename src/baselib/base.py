@@ -2,7 +2,10 @@
 #
 # Copyright 2025 Daniel Balparda (balparda@github.com) - Apache-2.0 license
 #
-"""Balparda's base library of util methods and classes."""
+"""Balparda's base library of util methods and classes.
+
+Docs for crypto: https://cryptography.io/en/latest/
+"""
 
 import base64
 import bz2

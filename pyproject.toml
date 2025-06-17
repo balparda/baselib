@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "baselib"
-version = "1.6"
+version = "1.7"
 description = "A base library for various utilities"
 readme = "README.md"
 license = "Apache-2.0"
@@ -21,7 +21,7 @@ dependencies = [
   "coverage>=7.8.2",
   "tomli>=2.2.1",
   "cryptography>=41.0.7",
-  "Pillow>=10.2.0"
+  "Pillow>=10.2"
 ]
 
 [tool.setuptools]
@@ -32,6 +32,9 @@ where = ["src"]  # auto-discover every importable package inside src/
 
 [tool.setuptools.package-data]
 "baselib" = ["py.typed"]
+
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.8"
 
 [pytest]
 pythonpath = ["src"]
