@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "balparda_baselib"
-version = "1.7"
+version = "1.8"
 description = "A base library for various utilities, by balparda@github.com"
 readme = "README.md"
 license = "Apache-2.0"
@@ -37,7 +37,8 @@ Homepage = "https://github.com/balparda/baselib"
 package-dir = {"" = "src"}   # root package namespace lives in src/
 
 [tool.setuptools.packages.find]
-where = ["src"]  # auto-discover every importable package inside src/
+where   = ["src"]                # auto-discover every importable package inside src/
+include = ["balparda_baselib*"]  # avoid picking up stuff not in "balparda_baselib"
 
 [tool.setuptools.package-data]
 "balparda_baselib" = ["py.typed"]

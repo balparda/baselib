@@ -2,27 +2,31 @@
 
 Balparda's base library of util methods and classes.
 
-Started in January/2023, by Daniel Balparda.
+Started in January/2023, by Daniel Balparda. This has stuff I used in my personal projects and then moved to a common library. It is all provided "as-is" without any promise or any presumption that it works or is safe. Use it if you like it but at you own risk and responsibility. Having said that, I make it public in the hope that it will be useful.
+
+Since version 1.7 it is PyPI package:
+
+<https://pypi.org/project/balparda_baselib/>
 
 ## License
 
-Copyright 2025 Daniel Balparda ([balparda@github.com](mailto:balparda@github.com))
+Copyright 2025 Daniel Balparda <balparda@github.com>
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a [copy of the License here](http://www.apache.org/licenses/LICENSE-2.0).
+Licensed under the ***Apache License, Version 2.0*** (the "License"); you may not use this file except in compliance with the License. You may obtain a [copy of the License here](http://www.apache.org/licenses/LICENSE-2.0).
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
 ## Setup
 
-If you want to develop for this project, first install
-[Poetry](https://python-poetry.org/docs/cli/), but make
-sure it is like this:
+To use in your project just do:
+
+```sh
+pip3 install balparda_baselib
+```
+
+and then `from balparda_baselib import base` for using it.
+
+If you want to develop for this project, first install [Poetry](https://python-poetry.org/docs/cli/), but make sure it is like this:
 
 ```sh
 brew uninstall poetry
@@ -44,7 +48,7 @@ git clone https://github.com/balparda/baselib.git baselib
 cd baselib
 
 poetry env use python3.13  # creates the venv
-poetry install --sync      # HONOR the project's poetry.lock file, uninstalls stray pkgs
+poetry install --sync      # HONOR the project's poetry.lock file, uninstalls stray packages
 poetry env info            # no-op: just to check
 
 poetry run pytest
@@ -120,12 +124,11 @@ poetry env remove <name-of-environment>
 
 ## Usage
 
-Import into your project and use the utilities. Just by importing
-you will set logging at `info` level to `stderr`. Some usage examples:
+Import into your project and use the utilities. Just by importing you will set logging at `info` level to `stderr`. Some usage examples:
 
 ```python
 import getpass
-from baselib import base
+from balparda_baselib import base
 
 @base.Timed('Total main() method execution time')
 def main():

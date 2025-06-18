@@ -19,7 +19,7 @@ from unittest import mock
 from src.balparda_baselib import base
 
 __author__ = 'balparda@github.com (Daniel Balparda)'
-__version__ = (1, 6)
+__version__: tuple[int, int] = (1, 8)
 
 
 class TestBase(unittest.TestCase):
