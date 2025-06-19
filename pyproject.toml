@@ -1,4 +1,6 @@
 # pyproject.toml  (preferred for new projects, PEP 621)
+# Copyright 2025 Daniel Balparda (balparda@github.com)
+# Apache-2.0 license
 
 [build-system]
 requires = ["setuptools>=77", "wheel"]
@@ -14,7 +16,7 @@ license-files = ["LICENSE"]
 authors = [
   { name = "Daniel Balparda", email = "balparda@github.com" }
 ]
-requires-python = ">=3.13.5"
+requires-python = ">=3.13.5"  # if version changes, remember to change README.md
 classifiers = [  # see: https://pypi.org/classifiers/
   "Programming Language :: Python :: 3",
   "Operating System :: OS Independent",
@@ -32,6 +34,7 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/balparda/baselib"
+PyPI = "https://pypi.org/project/balparda_baselib/"
 
 [tool.setuptools]
 package-dir = {"" = "src"}   # root package namespace lives in src/
@@ -45,6 +48,10 @@ include = ["balparda_baselib*"]  # avoid picking up stuff not in "balparda_basel
 
 [tool.poetry.requires-plugins]
 poetry-plugin-export = ">=1.8"
+
+[tool.poetry.group.dev.dependencies]
+pylint = "~3.3"
+flake8 = "~7.2"
 
 [pytest]
 pythonpath = ["src"]

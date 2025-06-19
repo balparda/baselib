@@ -18,6 +18,8 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 ## Setup
 
+### Install
+
 To use in your project just do:
 
 ```sh
@@ -25,6 +27,8 @@ pip3 install balparda_baselib
 ```
 
 and then `from balparda_baselib import base` for using it.
+
+### Development
 
 If you want to develop for this project, first install [Poetry](https://python-poetry.org/docs/cli/), but make sure it is like this:
 
@@ -42,6 +46,9 @@ Now install the project:
 
 ```sh
 brew install python@3.13 git
+brew update
+brew upgrade
+brew cleanup -s
 # or on Ubuntu/Debian: sudo apt-get install python3.13 python3.13-venv git
 
 git clone https://github.com/balparda/baselib.git baselib
