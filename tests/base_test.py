@@ -96,7 +96,7 @@ def temp_small_file() -> Generator[str, None, None]:
   os.remove(tmp_file.name)
 
 
-def test_FileHexHash(temp_small_file: str) -> None:
+def test_FileHexHash(temp_small_file: str) -> None:  # pylint: disable=redefined-outer-name
   """Test."""
   result: str = base.FileHexHash(temp_small_file)
   assert len(result) == 64
