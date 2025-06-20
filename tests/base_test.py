@@ -9,6 +9,7 @@ import base64
 import json
 import os.path
 # import pdb
+import sys
 import tempfile
 import time
 from typing import Any, Generator
@@ -266,3 +267,10 @@ def test_Timed() -> None:
     pass
 
   _tm()  # type:ignore
+
+
+if __name__ == '__main__':
+  # run only the tests in THIS file but pass through any extra CLI flags
+  args: list[str] = sys.argv[1:] + [__file__]
+  print(f'pytest {" ".join(args)}')
+  sys.exit(pytest.main(sys.argv[1:] + [__file__]))
