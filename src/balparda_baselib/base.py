@@ -32,9 +32,8 @@ __author__ = 'balparda@github.com'
 __version__: tuple[int, int] = (1, 8)  # v1.8, 2025-06-18
 
 
-# log format string
+# log format string, example logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 LOG_FORMAT: str = '%(asctime)-15s: %(module)s/%(funcName)s/%(lineno)d: %(message)s'
-# logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)  # set this as default
 
 # advanced log formats
 _LOG_FORMATS: list[str] = [
