@@ -3,6 +3,7 @@
 # Copyright 2025 Daniel Balparda (balparda@github.com) - Apache-2.0 license
 #
 # pylint: disable=invalid-name,protected-access
+# pyright: reportPrivateUsage=false
 """base.py unittest."""
 
 import base64
@@ -19,7 +20,7 @@ import pytest
 from src.balparda_baselib import base
 
 __author__ = 'balparda@github.com (Daniel Balparda)'
-__version__: tuple[int, int] = (1, 8)
+__version__: tuple[int, int] = (1, 9)
 
 
 def test_JsonToString_human_readable() -> None:

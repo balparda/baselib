@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "balparda_baselib"
-version = "1.8"
+version = "1.9"
 description = "A base library for various utilities, by balparda@github.com"
 readme = "README.md"
 license = "Apache-2.0"
@@ -16,9 +16,11 @@ license-files = ["LICENSE"]
 authors = [
   { name = "Daniel Balparda", email = "balparda@github.com" }
 ]
-requires-python = ">=3.13.5"  # if version changes, remember to change README.md
+requires-python = ">=3.12.11"  # if version changes, remember to change README.md
 classifiers = [  # see: https://pypi.org/classifiers/
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Operating System :: OS Independent",
   "Topic :: Utilities",
   "Topic :: Security :: Cryptography"
@@ -48,6 +50,7 @@ poetry-plugin-export = ">=1.8"
 [tool.poetry.group.dev.dependencies]
 pylint = "~3.3"
 flake8 = "~7.2"
+pyright = "~1.1"
 pytest = "^8.4"
 pytest-pythonpath = "^0.7"
 coverage = "^7.9"

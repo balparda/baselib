@@ -17,6 +17,7 @@ import os
 import os.path
 import pickle  # nosec - this is a dangerous module!
 # import pdb
+import re
 import time
 from typing import Any, Callable, Literal, Optional, Union
 
@@ -29,7 +30,7 @@ from PIL import Image
 from . import bin_fernet
 
 __author__ = 'balparda@github.com'
-__version__: tuple[int, int] = (1, 8)  # v1.8, 2025-06-18
+__version__: tuple[int, int] = (1, 9)  # v1.9, 2025-06-27
 
 
 # log format string, example logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
@@ -90,6 +91,8 @@ TERM_UNDERLINE = '\033[4m'
 # useful
 SEPARATION_LINE: str = TERM_BLUE + TERM_BOLD + ('-' * 80) + TERM_END
 STRONG_SEPARATION_LINE: str = TERM_BLUE + TERM_BOLD + ('=' * 80) + TERM_END
+_ANSI_ESCAPE: re.Pattern[str] = re.compile(r'\x1b\[[0-9;]*m')
+STRIP_ANSI: Callable[[str], str] = lambda s: _ANSI_ESCAPE.sub('', s)
 
 
 class Error(Exception):
