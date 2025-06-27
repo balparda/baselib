@@ -19,7 +19,7 @@ import pickle  # nosec - this is a dangerous module!
 # import pdb
 import re
 import time
-from typing import Any, Callable, Literal, Optional, Union
+from typing import Any, Callable, Literal
 
 from cryptography.hazmat.primitives import ciphers
 from cryptography.hazmat.primitives.ciphers import algorithms, modes
@@ -30,7 +30,7 @@ from PIL import Image
 from . import bin_fernet
 
 __author__ = 'balparda@github.com'
-__version__: tuple[int, int] = (1, 9)  # v1.9, 2025-06-27
+__version__: tuple[int, int] = (1, 10)  # v1.10, 2025-06-27
 
 
 # log format string, example logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
@@ -57,7 +57,7 @@ MODULE_PRIVATE_DIR: Callable[[str, str], str] = lambda f, p: os.path.join(MODULE
 
 # time utils
 _TIME_FORMAT: str = '%Y/%b/%d-%H:%M:%S-UTC'
-STD_TIME_STRING: Callable[[Union[int, float]], str] = lambda t: (
+STD_TIME_STRING: Callable[[int | float], str] = lambda t: (
     time.strftime(_TIME_FORMAT, time.gmtime(t)) if t else '-')  # cspell:disable-line
 INT_TIME: Callable[[], int] = lambda: int(time.time())
 STR_TIME: Callable[[], str] = lambda: STD_TIME_STRING(INT_TIME())
@@ -99,40 +99,40 @@ class Error(Exception):
   """Base exception."""
 
 
-JsonType = dict[str, Union[None, int, str, bool, float, list[Any], dict[str, Any]]]
+JsonType = dict[str, None | int | str | bool | float | list[Any] | dict[str, Any]]
 
 
-def JsonToString(obj: JsonType, human_readable: bool = True) -> str:
+def JsonToString(obj: JsonType, /, *, human_readable: bool = True) -> str:
   """Convert JSON to string, either compact or with indentation (human_readable True, default)."""
   return json.dumps(obj, indent=4 if human_readable else None)
 
 
-def JsonToBytes(obj: JsonType) -> bytes:
+def JsonToBytes(obj: JsonType, /) -> bytes:
   """Convert JSON to bytes."""
   return json.dumps(obj).encode('utf-8')
 
 
-def StringToJson(obj: str) -> JsonType:
+def StringToJson(obj: str, /) -> JsonType:
   """Convert string to JSON."""
   return json.loads(obj)
 
 
-def BytesToJson(obj: bytes) -> JsonType:
+def BytesToJson(obj: bytes, /) -> JsonType:
   """Convert bytes to JSON."""
   return json.loads(obj.decode('utf-8'))
 
 
-def BytesBinHash(data: bytes) -> bytes:
+def BytesBinHash(data: bytes, /) -> bytes:
   """SHA-256 hash of bytes data. Always a length 32 bytes."""
   return hashlib.sha256(data).digest()
 
 
-def BytesHexHash(data: bytes) -> str:
+def BytesHexHash(data: bytes, /) -> str:
   """SHA-256 hex hash of bytes data. Always a length 64 string (32 bytes, hexadecimal)."""
   return hashlib.sha256(data).hexdigest()
 
 
-def FileHexHash(full_path: str) -> str:
+def FileHexHash(full_path: str, /) -> str:
   """SHA-256 hex hash of file on disk. Always a length 64 string (32 bytes, hexadecimal)."""
   logging.info('Hashing file %r', full_path)
   if not os.path.exists(full_path):
@@ -141,12 +141,12 @@ def FileHexHash(full_path: str) -> str:
     return BytesHexHash(file_obj.read())
 
 
-def ImageHexHash(img: Image.Image) -> str:
+def ImageHexHash(img: Image.Image, /) -> str:
   """SHA-256 hex hash of internal image data (ignores metadata!). Always a length 64 string."""
   return BytesHexHash(img.tobytes())  # type:ignore
 
 
-def HumanizedBytes(inp_sz: int) -> str:
+def HumanizedBytes(inp_sz: int, /) -> str:
   """Return human-readable byte sizes.
 
   Args:
@@ -171,7 +171,7 @@ def HumanizedBytes(inp_sz: int) -> str:
   return f'{(inp_sz / (1024.0 * 1024.0 * 1024.0 * 1024.0)):0.2f}Tb'
 
 
-def HumanizedDecimal(inp_sz: int) -> str:
+def HumanizedDecimal(inp_sz: int, /) -> str:
   """Return human-readable decimal-measured sizes.
 
   Args:
@@ -196,7 +196,7 @@ def HumanizedDecimal(inp_sz: int) -> str:
   return f'{(inp_sz / (1000.0 * 1000.0 * 1000.0 * 1000.0)):0.2f}T'
 
 
-def HumanizedSeconds(inp_secs: Union[int, float]) -> str:
+def HumanizedSeconds(inp_secs: int | float, /) -> str:  # pylint: disable=too-many-return-statements
   """Return human-readable time.
 
   Args:
@@ -245,16 +245,16 @@ class Timer:
   See also the Timed() decorator below.
   """
 
-  def __init__(self, log: Optional[str] = None) -> None:
+  def __init__(self, log: str | None = None) -> None:
     """Construct.
 
     Args:
       log: (default None) If given as string will logging.info a log upon __exit__
           like '%s: %s' % (log, execution_time)
     """
-    self._start: Optional[float] = None
-    self._end: Optional[float] = None
-    self._log: Optional[str] = log
+    self._start: float | None = None
+    self._end: float | None = None
+    self._log: str | None = log
 
   def __enter__(self) -> Any:
     """Enter Timed context. Starts the timer."""
@@ -295,7 +295,7 @@ class Timer:
     return readable
 
 
-def Timed(log: Optional[str] = None) -> Callable[[Callable[[Any], Any]], Callable[[Any], Any]]:
+def Timed(log: str | None = None) -> Callable[[Callable[[Any], Any]], Callable[[Any], Any]]:
   """Make any call print its execution time, to be used as a decorator.
 
   Args:
@@ -316,7 +316,7 @@ def Timed(log: Optional[str] = None) -> Callable[[Callable[[Any], Any]], Callabl
   return _Timed
 
 
-def DeriveKeyFromStaticPassword(str_password: str) -> bytes:
+def DeriveKeyFromStaticPassword(str_password: str, /) -> bytes:
   """Derive crypto key using string password.
 
   This is, purposefully, a very costly operation that should be cheap to execute once
@@ -354,12 +354,12 @@ def DeriveKeyFromStaticPassword(str_password: str) -> bytes:
   return base64.urlsafe_b64encode(crypto_key)
 
 
-def Encrypt(plaintext: bytes, key: bytes) -> bytes:
+def Encrypt(plaintext: bytes, key: bytes, /) -> bytes:
   """Encryption wrapper."""
   return bin_fernet.BinaryFernet(key).encrypt(plaintext)
 
 
-def Decrypt(ciphertext: bytes, key: bytes) -> bytes:
+def Decrypt(ciphertext: bytes, key: bytes, /) -> bytes:
   """Decryption wrapper."""
   return bin_fernet.BinaryFernet(key).decrypt(ciphertext)
 
@@ -373,7 +373,7 @@ class BlockEncoder256:
   Docs: https://cryptography.io/en/latest/
   """
 
-  def __init__(self, key256: bytes) -> None:
+  def __init__(self, key256: bytes, /) -> None:
     """Construct.
 
     Args:
@@ -386,32 +386,32 @@ class BlockEncoder256:
       raise Error(f'Key must be 256 bits (32 bytes) long, got {len(key256)}')
     self._cipher = ciphers.Cipher(algorithms.AES256(key256), modes.ECB())  # nosec
 
-  def EncryptBlock256(self, plaintext256: bytes) -> bytes:
+  def EncryptBlock256(self, plaintext256: bytes, /) -> bytes:
     """Encrypt a 256 bits block."""
     if len(plaintext256) != 32:
       raise Error(f'Plaintext must be 256 bits (32 bytes) long, got {len(plaintext256)}')
     encoder: ciphers.CipherContext = self._cipher.encryptor()  # cspell:disable-line
     return encoder.update(plaintext256) + encoder.finalize()
 
-  def DecryptBlock256(self, ciphertext256: bytes) -> bytes:
+  def DecryptBlock256(self, ciphertext256: bytes, /) -> bytes:
     """Decrypt a 256 bits block."""
     if len(ciphertext256) != 32:
       raise Error(f'Ciphertext must be 256 bits (32 bytes) long, got {len(ciphertext256)}')
     encoder: ciphers.CipherContext = self._cipher.decryptor()  # cspell:disable-line
     return encoder.update(ciphertext256) + encoder.finalize()
 
-  def EncryptHexdigest256(self, plaintext_hexdigest: str) -> str:
+  def EncryptHexdigest256(self, plaintext_hexdigest: str, /) -> str:
     """Encrypt a 256 bits hexadecimal block, outputting also a 256 bits hexadecimal."""
     return self.EncryptBlock256(bytes.fromhex(plaintext_hexdigest)).hex()
 
-  def DecryptHexdigest256(self, ciphertext_hexdigest: str) -> str:
+  def DecryptHexdigest256(self, ciphertext_hexdigest: str, /) -> str:
     """Decrypt a 256 bits hexadecimal block, outputting also a 256 bits hexadecimal."""
     return self.DecryptBlock256(bytes.fromhex(ciphertext_hexdigest)).hex()
 
 
 def BinSerialize(
-    obj: Any, /, file_path: Optional[str] = None,
-    compress: bool = True, key: Optional[bytes] = None) -> bytes:
+    obj: Any, /, *, file_path: str | None = None,
+    compress: bool = True, key: bytes | None = None) -> bytes:
   """Serialize a Python object into a BLOB.
 
   If encryption is "on", note that the original Fernet deals in URL-safe base64, but we have a
@@ -453,8 +453,8 @@ def BinSerialize(
 
 
 def BinDeSerialize(
-    data: Optional[bytes] = None, file_path: Optional[str] = None,
-    compress: bool = True, key: Optional[bytes] = None) -> Any:
+    *, data: bytes | None = None, file_path: str | None = None,
+    compress: bool = True, key: bytes | None = None) -> Any:
   """De-Serializes a BLOB back to a Python object.
 
   If encryption is "on", note that the original Fernet deals in URL-safe base64, but we have a

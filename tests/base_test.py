@@ -20,7 +20,7 @@ import pytest
 from src.balparda_baselib import base
 
 __author__ = 'balparda@github.com (Daniel Balparda)'
-__version__: tuple[int, int] = (1, 9)
+__version__: tuple[int, int] = (1, 10)
 
 
 def test_JsonToString_human_readable() -> None:
@@ -229,20 +229,20 @@ def test_Serialize() -> None:
   """Test."""
   # do memory serialization test
   serial: bytes = base.BinSerialize(({1: 2, 3: 4}, []))
-  obj: Any = base.BinDeSerialize(serial)
+  obj: Any = base.BinDeSerialize(data=serial)
   assert obj == ({1: 2, 3: 4}, [])
   # do uncompressed memory serialization test
   serial = base.BinSerialize(({5: 6, 7: 8}, [9, 10]), compress=False)
-  obj = base.BinDeSerialize(serial, compress=False)
+  obj = base.BinDeSerialize(data=serial, compress=False)
   assert obj == ({5: 6, 7: 8}, [9, 10])
   # do encrypted uncompressed memory serialization test
   crypto_key = b'LRtw2A4U9PAtihUow5p_eQex6IYKM7nUoPlf1fkKPgc='
   serial = base.BinSerialize(({10: 9, 8: 7}, {6, 5}), compress=False, key=crypto_key)
-  obj = base.BinDeSerialize(serial, compress=False, key=crypto_key)
+  obj = base.BinDeSerialize(data=serial, compress=False, key=crypto_key)
   assert obj == ({10: 9, 8: 7}, {6, 5})
   # do encrypted and compressed memory serialization test
   serial = base.BinSerialize(({100: 90, 80: 70}, {60, 50}), compress=True, key=crypto_key)
-  obj = base.BinDeSerialize(serial, key=crypto_key)
+  obj = base.BinDeSerialize(data=serial, key=crypto_key)
   assert obj == ({100: 90, 80: 70}, {60, 50})
   # do compressed disk serialization test
   with tempfile.TemporaryDirectory() as tmpdir:
