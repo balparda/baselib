@@ -20,7 +20,6 @@ import pytest
 from src.balparda_baselib import base
 
 __author__ = 'balparda@github.com (Daniel Balparda)'
-__version__: tuple[int, int] = (1, 10)
 
 
 def test_JsonToString_human_readable() -> None:
