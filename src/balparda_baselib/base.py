@@ -30,7 +30,7 @@ from PIL import Image
 from . import bin_fernet
 
 __author__ = 'balparda@github.com'
-__version__: tuple[int, int] = (1, 10)  # v1.10, 2025-06-27
+__version__: tuple[int, int] = (1, 11)  # v1.11, 2025-07-04
 
 
 # log format string, example logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)

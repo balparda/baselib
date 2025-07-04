@@ -1,4 +1,4 @@
-cffi==1.17.1 ; python_full_version >= "3.12.11" and platform_python_implementation != "PyPy"
-cryptography==45.0.4 ; python_full_version >= "3.12.11"
-pillow==11.2.1 ; python_full_version >= "3.12.11"
-pycparser==2.22 ; python_full_version >= "3.12.11" and platform_python_implementation != "PyPy"
+cffi==1.17.1 ; python_full_version >= "3.11.13" and platform_python_implementation != "PyPy"
+cryptography==45.0.5 ; python_full_version >= "3.11.13"
+pillow==11.3.0 ; python_full_version >= "3.11.13"
+pycparser==2.22 ; python_full_version >= "3.11.13" and platform_python_implementation != "PyPy"
