@@ -124,7 +124,7 @@ poetry env use python3.11  # creates the venv, use python 3.11 for development, 
 poetry install --sync      # HONOR the project's poetry.lock file, uninstalls stray packages
 poetry env info            # no-op: just to check
 
-poetry run pytest
+poetry run pytest -vvv
 # or any command as:
 poetry run <any-command>
 ```
